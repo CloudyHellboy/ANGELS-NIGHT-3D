@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#05050b" />
+<title>ANGELS NIGHT v1.1 — Character Visual Upgrade</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box} body{margin:0;overflow:hidden;background:#05050b;color:#f5f2fb;touch-action:none;user-select:none;-webkit-user-select:none}
+button{font:inherit;cursor:pointer}
+#root,#scene{position:fixed;inset:0} #scene canvas{display:block;width:100%;height:100%}
+#top{position:fixed;left:14px;right:14px;top:14px;z-index:4;display:flex;justify-content:space-between;gap:12px;pointer-events:none}
+.panel{background:#090913d8;border:1px solid #594c70;border-radius:14px;padding:10px 12px;box-shadow:0 6px 24px #0008;pointer-events:auto}
+#brand{max-width:360px} #brand h1{margin:0;font-size:18px;letter-spacing:.08em;font-weight:900} #brand h1 span{color:#f1538b}
+#brand small{display:block;color:#b6abc7;margin-top:4px;line-height:1.35;font-size:11px}
+#hudRight{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#stats{font-size:11px;text-align:right;color:#e5deef;line-height:1.45;min-width:160px}
+#charCard{min-width:200px}
+#charName{font-size:16px;font-weight:900}.sub{font-size:11px;color:#c6bdd7;margin-top:3px}
+#canon{margin-top:8px;font-size:11px;line-height:1.4;color:#efe9f8}
+#bottom{position:fixed;left:14px;right:14px;bottom:14px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;z-index:4;pointer-events:none}
+#controls{max-width:420px;font-size:11px;line-height:1.45;color:#ebe5f2}
+#controls b{color:#fff}
+#actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
+#actions button{background:#23182c;color:#fff;border:1px solid #78618f;padding:11px 13px;border-radius:12px;font-size:11px;font-weight:800}
+#actions button.accent{background:#7b1d49;border-color:#f05a93}
+#hint{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:5;background:#0d1223e8;border:1px solid #4bdcff66;padding:10px 16px;border-radius:999px;font-size:12px;color:#d9f7ff;box-shadow:0 8px 30px #0008}
+#touch{display:none;position:fixed;inset:0;z-index:5;pointer-events:none}
+#touch.enabled{display:block}
+#pad{position:absolute;left:18px;bottom:28px;width:124px;height:124px;border-radius:50%;background:#3b315075;border:2px solid #c6aed16d;pointer-events:auto;touch-action:none}
+#knob{position:absolute;left:40px;top:40px;width:42px;height:42px;border-radius:50%;background:#dfaccbcd;border:1px solid #fff5}
+#tbuttons{position:absolute;right:14px;bottom:20px;display:grid;grid-template-columns:repeat(3,auto);gap:10px;pointer-events:auto}
+#tbuttons button{min-width:72px;padding:11px 10px;border-radius:14px;border:1px solid #d8b4df80;background:#412548cc;color:#fff;font-size:10px;font-weight:800}
+#overlay{position:fixed;inset:0;display:grid;place-items:center;z-index:8;background:radial-gradient(circle at 50% 40%,#24172aee,#04040b 75%);padding:20px}
+#overlay .card{width:min(760px,100%);background:#090914df;border:1px solid #67567f;border-radius:22px;padding:22px;box-shadow:0 18px 80px #000c}
+#overlay h2{margin:0 0 10px;font-size:40px;line-height:1;font-weight:1000;letter-spacing:.1em}.pink{color:#f1538b}
+#overlay p{line-height:1.6;color:#e4ddec;font-size:14px}
+#overlay ul{margin:12px 0 0 18px;color:#cfc5de;font-size:13px;line-height:1.55}
+#overlay .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.cta button{padding:14px 18px;border-radius:12px;border:1px solid #8e789d;background:#1b1422;color:#fff;font-weight:900}.cta button.main{background:#9f245e;border-color:#ff6ba1}
+#report{position:fixed;right:14px;bottom:142px;z-index:4;background:#0a0a11e8;border:1px solid #54496c;border-radius:14px;padding:10px 12px;font-size:11px;line-height:1.35;max-width:260px;display:none}
+#report.show{display:block}
+@media (max-width: 760px){#top{flex-direction:column}#hudRight{align-items:stretch}#bottom{flex-direction:column;align-items:stretch}#actions{justify-content:flex-start}#hint{bottom:168px;width:min(90vw,420px);text-align:center}#controls{max-width:none}#report{left:14px;right:14px;bottom:154px;max-width:none}#overlay h2{font-size:32px}}
+@media (max-height: 540px){#brand small,#canon,.sub,#controls{font-size:10px}#hint{bottom:82px}#pad{bottom:12px;width:110px;height:110px}#knob{left:34px;top:34px}#tbuttons{bottom:10px}}
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="scene"></div>
+  <div id="top">
+    <div id="brand" class="panel">
+      <h1>ANGELS <span>NIGHT</span> v1.1</h1>
+      <small>CHARACTER VISUAL UPGRADE · versão focada em HellBoy e Nebulosa. O objetivo agora é aprovar os protagonistas antes de continuar a expansão do jogo.</small>
+    </div>
+    <div id="hudRight">
+      <div id="stats" class="panel">FPS: --<br/>Gráficos: AUTO<br/>Modo: SHOWCASE</div>
+      <div id="charCard" class="panel">
+        <div id="charName">HellBoy</div>
+        <div class="sub" id="charRole">Protagonista jogável · combate e coragem</div>
+        <div id="canon"></div>
+      </div>
+    </div>
+  </div>
+  <div id="bottom">
+    <div id="controls" class="panel">
+      <b>PC:</b> WASD mover · mouse/arrastar câmera · Shift correr · Espaço pular/salto duplo · Tab trocar · T modo showcase · G gráficos<br/>
+      <b>Android:</b> joystick · Correr · Pular · Trocar · Showcase · Gráficos. Esta versão prioriza aparência dos protagonistas e fluidez no Galaxy A11.
+    </div>
+    <div id="actions">
+      <button id="modeBtn" class="accent">MODO SHOWCASE</button>
+      <button id="switchBtn">TROCAR PERSONAGEM</button>
+      <button id="graphicsBtn">GRÁFICOS: AUTO</button>
+      <button id="resetBtn">REPOSICIONAR</button>
+      <button id="reportBtn">RELATÓRIO</button>
+    </div>
+  </div>
+  <div id="hint">Use o modo SHOWCASE para inspecionar melhor HellBoy e Nebulosa.</div>
+  <div id="report"></div>
+  <div id="touch">
+    <div id="pad"><div id="knob"></div></div>
+    <div id="tbuttons">
+      <button id="runBtn">CORRER</button>
+      <button id="jumpBtn">PULAR</button>
+      <button id="switchTouchBtn">TROCAR</button>
+      <button id="modeTouchBtn">SHOWCASE</button>
+      <button id="graphicsTouchBtn">GRÁFICOS</button>
+      <button id="reportTouchBtn">RELATÓRIO</button>
+    </div>
+  </div>
+  <div id="overlay">
+    <div class="card">
+      <h2><span class="pink">HELLBOY</span> &amp; NEBULOSA</h2>
+      <p>Esta entrega congela a expansão do mapa e concentra o trabalho em dois pontos: <b>identidade visual</b> e <b>desempenho</b>. Aqui você pode andar, correr, pular, trocar de personagem e inspecionar os modelos 3D estilizados melhorados dos protagonistas.</p>
+      <ul>
+        <li><b>HellBoy:</b> boné preto, cabelo militar oculto, pena branca, cruz no pescoço, camiseta oversized e cargo com correntes.</li>
+        <li><b>Nebulosa:</b> pele pálida, cabelo longo preto com mecha vermelha, jaqueta oversized, saia, meia rasgada e câmera.</li>
+        <li><b>Meta:</b> ficar digno visualmente sem destruir o desempenho no Galaxy A11.</li>
+      </ul>
+      <div class="cta">
+        <button class="main" id="startBtn">ENTRAR</button>
+        <button id="startShowcaseBtn">ENTRAR DIRETO EM SHOWCASE</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module">
+let THREE;
+try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.175.0/build/three.module.js'); }
+catch (e1) {
+  try { THREE = await import('https://unpkg.com/three@0.175.0/build/three.module.js'); }
+  catch (e2) { alert('Não foi possível carregar o motor 3D. Conecte-se à internet e recarregue.'); throw e2; }
+}
+
+const coarse = matchMedia('(pointer: coarse)').matches;
+if (coarse) document.getElementById('touch').classList.add('enabled');
+const state = {
+  active: 0,
+  started: false,
+  showcase: false,
+  sprint: false,
+  graphics: 'AUTO',
+  input: new Set(),
+  padX: 0, padY: 0,
+  camYaw: 0, camPitch: 0.23,
+  fps: 0, fpsAccum: 0, fpsFrames: 0,
+  renderScale: 1,
+  clockStarted: false
+};
+const root = document.getElementById('scene');
+const statsEl = document.getElementById('stats');
+const canonEl = document.getElementById('canon');
+const charNameEl = document.getElementById('charName');
+const charRoleEl = document.getElementById('charRole');
+const reportEl = document.getElementById('report');
+const hintEl = document.getElementById('hint');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#05050b');
+scene.fog = new THREE.FogExp2('#05050b', 0.02);
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.05, 80);
+const renderer = new THREE.WebGLRenderer({antialias: !coarse, powerPreference:'high-performance', alpha:false});
+root.appendChild(renderer.domElement);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const qualityModes = {
+  AUTO: coarse ? 1.0 : 1.2,
+  ECO: 0.86,
+  NORMAL: 1.0,
+  DETALHES: 1.25
+};
+function applyGraphics(mode){
+  state.graphics = mode;
+  state.renderScale = qualityModes[mode];
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, state.renderScale));
+  renderer.setSize(innerWidth, innerHeight, false);
+  const btnText = 'GRÁFICOS: ' + mode;
+  document.getElementById('graphicsBtn').textContent = btnText;
+  document.getElementById('graphicsTouchBtn').textContent = 'GRÁFICOS';
+}
+applyGraphics('AUTO');
+
+scene.add(new THREE.AmbientLight('#716888', 0.7));
+const hemi = new THREE.HemisphereLight('#cfd8ff', '#1a1520', 1.1); scene.add(hemi);
+const key = new THREE.SpotLight('#ffffff', 35, 55, Math.PI/5.4, 0.4, 0.8); key.position.set(5,10,6); key.castShadow=true; scene.add(key); scene.add(key.target);
+const rim = new THREE.PointLight('#f14182', 9, 18); rim.position.set(-5, 4.5, -4); scene.add(rim);
+const fill = new THREE.PointLight('#62d0ff', 7, 16); fill.position.set(5, 3.5, -7); scene.add(fill);
+
+const mats = {
+  black: new THREE.MeshStandardMaterial({color:'#0a0a0f', roughness:0.88}),
+  cloth: new THREE.MeshStandardMaterial({color:'#111117', roughness:0.95}),
+  gray: new THREE.MeshStandardMaterial({color:'#38343f', roughness:0.65, metalness:0.35}),
+  silver: new THREE.MeshStandardMaterial({color:'#bfc4d2', roughness:0.25, metalness:0.95}),
+  skin: new THREE.MeshStandardMaterial({color:'#bc876a', roughness:0.84}),
+  pale: new THREE.MeshStandardMaterial({color:'#ead4d4', roughness:0.88}),
+  red: new THREE.MeshStandardMaterial({color:'#a51231', roughness:0.7}),
+  white: new THREE.MeshStandardMaterial({color:'#f8f8fb', roughness:0.65}),
+  floor: new THREE.MeshStandardMaterial({color:'#16131d', roughness:0.96}),
+  wall: new THREE.MeshStandardMaterial({color:'#0d0d14', roughness:0.98}),
+  emissivePink: new THREE.MeshStandardMaterial({color:'#ff4f90', emissive:'#ff4f90', emissiveIntensity:1.7}),
+  emissiveBlue: new THREE.MeshStandardMaterial({color:'#67dbff', emissive:'#2ea4d6', emissiveIntensity:1.4})
+};
+
+function mesh(geo, mat, x=0,y=0,z=0, rx=0,ry=0,rz=0){
+  const m = new THREE.Mesh(geo, mat); m.position.set(x,y,z); m.rotation.set(rx,ry,rz); m.castShadow = true; m.receiveShadow = true; return m;
+}
+
+// environment: clean visual lab inside Orfeu aesthetic
+const room = new THREE.Group(); scene.add(room);
+room.add(mesh(new THREE.BoxGeometry(18,0.2,18), mats.floor, 0,-0.1,0));
+room.add(mesh(new THREE.BoxGeometry(18,6,0.3), mats.wall, 0,3,-9));
+room.add(mesh(new THREE.BoxGeometry(18,6,0.3), mats.wall, 0,3,9));
+room.add(mesh(new THREE.BoxGeometry(0.3,6,18), mats.wall, -9,3,0));
+room.add(mesh(new THREE.BoxGeometry(0.3,6,18), mats.wall, 9,3,0));
+room.add(mesh(new THREE.BoxGeometry(18,0.3,18), mats.wall, 0,6,0));
+room.add(mesh(new THREE.CylinderGeometry(2.8,2.9,0.28,48), mats.gray, 0,0.05,-2.4));
+room.add(mesh(new THREE.TorusGeometry(3.1,0.05,8,54), mats.emissivePink, 0,0.13,-2.4, -Math.PI/2));
+room.add(mesh(new THREE.BoxGeometry(8,0.1,0.1), mats.emissiveBlue, 0,4.8,-8.74));
+room.add(mesh(new THREE.BoxGeometry(0.1,0.1,8), mats.emissiveBlue, -8.74,4.8,0));
+room.add(mesh(new THREE.BoxGeometry(0.1,0.1,8), mats.emissiveBlue, 8.74,4.8,0));
+room.add(mesh(new THREE.BoxGeometry(8,0.1,0.1), mats.emissiveBlue, 0,4.8,8.74));
+for (const x of [-5.5,5.5]) room.add(mesh(new THREE.BoxGeometry(1.8,3.1,0.25), mats.gray, x,1.55,-8.7));
+const grid = new THREE.GridHelper(18, 18, '#4a3e5c', '#2a2234'); grid.position.y=0.001; scene.add(grid);
+
+function createHellBoy(){
+  const g = new THREE.Group();
+  const body = new THREE.Group(); g.add(body);
+  // legs
+  const upperL = mesh(new THREE.BoxGeometry(0.32,0.92,0.34), mats.black, -0.18,0.96,0);
+  const upperR = mesh(new THREE.BoxGeometry(0.32,0.92,0.34), mats.black, 0.18,0.96,0);
+  const lowerL = mesh(new THREE.BoxGeometry(0.26,0.86,0.28), mats.black, -0.18,0.44,0.03);
+  const lowerR = mesh(new THREE.BoxGeometry(0.26,0.86,0.28), mats.black, 0.18,0.44,0.03);
+  body.add(upperL, upperR, lowerL, lowerR);
+  // cargo details & chains
+  for (const x of [-0.18, 0.18]) {
+    body.add(mesh(new THREE.BoxGeometry(0.17,0.18,0.08), mats.gray, x,1.03,0.21));
+  }
+  const chain1 = mesh(new THREE.TorusGeometry(0.12,0.015,5,18), mats.silver, -0.38,1.0,0.05,0,0.2,1.4);
+  const chain2 = mesh(new THREE.TorusGeometry(0.14,0.015,5,18), mats.silver, -0.32,0.82,0.04,0,0.2,1.4);
+  body.add(chain1, chain2);
+  // torso oversized shirt
+  body.add(mesh(new THREE.BoxGeometry(1.0,1.16,0.56), mats.cloth, 0,1.95,0));
+  body.add(mesh(new THREE.BoxGeometry(1.08,0.28,0.6), mats.cloth, 0,1.39,0));
+  // arms
+  const armL = mesh(new THREE.BoxGeometry(0.28,1.0,0.28), mats.cloth, -0.67,1.9,0);
+  const armR = mesh(new THREE.BoxGeometry(0.28,1.0,0.28), mats.cloth, 0.67,1.9,0);
+  body.add(armL, armR);
+  body.add(mesh(new THREE.BoxGeometry(0.18,0.26,0.18), mats.skin, -0.67,1.35,0));
+  body.add(mesh(new THREE.BoxGeometry(0.18,0.26,0.18), mats.skin, 0.67,1.35,0));
+  body.add(mesh(new THREE.BoxGeometry(0.18,0.25,0.2), mats.black, -0.67,1.48,0));
+  body.add(mesh(new THREE.BoxGeometry(0.18,0.25,0.2), mats.black, 0.67,1.48,0));
+  // shoes
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.17,0.68), mats.black, -0.18,0.05,0.08));
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.17,0.68), mats.black, 0.18,0.05,0.08));
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.05,0.72), mats.white, -0.18,-0.01,0.08));
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.05,0.72), mats.white, 0.18,-0.01,0.08));
+  // head and cap
+  body.add(mesh(new THREE.BoxGeometry(0.52,0.58,0.48), mats.skin, 0,2.77,0.01));
+  body.add(mesh(new THREE.BoxGeometry(0.62,0.22,0.56), mats.black, 0,3.03,-0.02));
+  body.add(mesh(new THREE.BoxGeometry(0.76,0.18,0.68), mats.black, 0,3.18,-0.03));
+  body.add(mesh(new THREE.BoxGeometry(0.48,0.08,0.18), mats.black, 0,3.14,-0.41)); // brim
+  // face suggestion
+  body.add(mesh(new THREE.BoxGeometry(0.11,0.025,0.02), mats.black, -0.1,2.82,-0.24));
+  body.add(mesh(new THREE.BoxGeometry(0.11,0.025,0.02), mats.black, 0.1,2.82,-0.24));
+  body.add(mesh(new THREE.BoxGeometry(0.11,0.02,0.02), mats.black, 0,2.64,-0.24));
+  // cross tattoo left neck
+  body.add(mesh(new THREE.BoxGeometry(0.018,0.14,0.01), mats.black, -0.22,2.54,-0.12,0,0.0,-0.35));
+  body.add(mesh(new THREE.BoxGeometry(0.09,0.018,0.01), mats.black, -0.22,2.54,-0.12,0,0.0,-0.35));
+  // feather necklace
+  body.add(mesh(new THREE.TorusGeometry(0.16,0.008,6,22), mats.silver, 0,2.28,0.17,1.55,0,0));
+  body.add(mesh(new THREE.ConeGeometry(0.06,0.24,7), mats.white, 0,2.05,0.25,Math.PI,0,0));
+  // halo subtle style callback from art
+  body.add(mesh(new THREE.TorusGeometry(0.31,0.012,4,24), mats.gray, 0,3.55,0,Math.PI/2,0,0));
+  g.userData = { kind:'hellboy', armL, armR, upperL, upperR, lowerL, lowerR };
+  return g;
+}
+
+function createNebulosa(){
+  const g = new THREE.Group();
+  const body = new THREE.Group(); g.add(body);
+  // legs with tights
+  const tights = new THREE.MeshStandardMaterial({color:'#2f2734', roughness:0.88});
+  const legL = mesh(new THREE.BoxGeometry(0.21,1.15,0.24), tights, -0.17,0.64,0);
+  const legR = mesh(new THREE.BoxGeometry(0.21,1.15,0.24), tights, 0.17,0.64,0);
+  body.add(legL, legR);
+  // ripped sections suggestion
+  body.add(mesh(new THREE.BoxGeometry(0.09,0.1,0.02), mats.pale, -0.17,0.9,0.13));
+  body.add(mesh(new THREE.BoxGeometry(0.11,0.12,0.02), mats.pale, 0.17,0.55,0.13));
+  body.add(mesh(new THREE.BoxGeometry(0.08,0.08,0.02), mats.pale, -0.17,0.28,0.13));
+  // shoes
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.2,0.74), mats.black, -0.17,-0.04,0.1));
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.2,0.74), mats.black, 0.17,-0.04,0.1));
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.06,0.78), mats.white, -0.17,-0.11,0.1));
+  body.add(mesh(new THREE.BoxGeometry(0.34,0.06,0.78), mats.white, 0.17,-0.11,0.1));
+  // skirt
+  body.add(mesh(new THREE.CylinderGeometry(0.54,0.72,0.46, 8), mats.black, 0,1.32,0));
+  // oversized jacket and inner shirt
+  body.add(mesh(new THREE.BoxGeometry(1.08,1.18,0.64), mats.cloth, 0,2.03,0));
+  body.add(mesh(new THREE.BoxGeometry(1.24,0.28,0.68), mats.cloth, 0,1.44,0));
+  body.add(mesh(new THREE.BoxGeometry(0.64,0.76,0.08), mats.black, 0,2.0,0.32));
+  // arms
+  const armL = mesh(new THREE.BoxGeometry(0.3,1.12,0.3), mats.cloth, -0.74,1.88,0.02);
+  const armR = mesh(new THREE.BoxGeometry(0.3,1.12,0.3), mats.cloth, 0.74,1.88,0.02);
+  body.add(armL, armR);
+  body.add(mesh(new THREE.BoxGeometry(0.16,0.24,0.16), mats.pale, -0.74,1.28,0.02));
+  body.add(mesh(new THREE.BoxGeometry(0.16,0.24,0.16), mats.pale, 0.74,1.28,0.02));
+  // camera bag
+  body.add(mesh(new THREE.BoxGeometry(0.42,0.34,0.18), mats.black, 0.73,1.42,0.31,0.0,0.0,0.08));
+  body.add(mesh(new THREE.TorusGeometry(0.72,0.015,6,34), mats.gray, 0.11,1.93,0.09,0.2,0.0,1.0));
+  // camera
+  body.add(mesh(new THREE.BoxGeometry(0.26,0.18,0.16), mats.gray, -0.24,1.58,0.34));
+  body.add(mesh(new THREE.CylinderGeometry(0.05,0.05,0.07, 12), mats.black, -0.24,1.58,0.44, Math.PI/2,0,0));
+  // head and hair
+  body.add(mesh(new THREE.BoxGeometry(0.5,0.58,0.46), mats.pale, 0,2.82,0));
+  body.add(mesh(new THREE.BoxGeometry(0.72,1.48,0.18), mats.black, 0,2.42,0.18));
+  body.add(mesh(new THREE.BoxGeometry(0.14,1.42,0.08), mats.red, -0.18,2.41,-0.18));
+  body.add(mesh(new THREE.BoxGeometry(0.66,0.26,0.5), mats.black, 0,3.06,0.02));
+  body.add(mesh(new THREE.BoxGeometry(0.13,0.02,0.02), mats.black, -0.1,2.86,-0.23));
+  body.add(mesh(new THREE.BoxGeometry(0.13,0.02,0.02), mats.black, 0.1,2.86,-0.23));
+  body.add(mesh(new THREE.BoxGeometry(0.11,0.016,0.02), mats.red, 0,2.67,-0.23));
+  // silver accessories
+  body.add(mesh(new THREE.TorusGeometry(0.13,0.008,5,18), mats.silver, 0,2.42,0.17,1.55,0,0));
+  body.add(mesh(new THREE.CylinderGeometry(0.008,0.008,0.12, 8), mats.silver, 0.21,2.74,-0.03));
+  body.add(mesh(new THREE.BoxGeometry(0.04,0.008,0.008), mats.silver, 0.21,2.69,-0.03));
+  g.userData = { kind:'nebulosa', armL, armR, legL, legR };
+  return g;
+}
+
+function createShadowDisk(radius=0.55){
+  const d = new THREE.Mesh(new THREE.CircleGeometry(radius, 28), new THREE.MeshBasicMaterial({color:'#000000', transparent:true, opacity:0.22}));
+  d.rotation.x = -Math.PI/2; d.position.y = 0.005; return d;
+}
+
+const characters = [
+  {
+    name:'HellBoy', role:'Protagonista jogável · combate e coragem',
+    canon:['Boné preto obrigatório','Cabelo militar oculto','Pena branca','Cruz no pescoço esquerdo','Cargo com correntes'],
+    model:createHellBoy(), pos:new THREE.Vector3(-1.1,0,-2.4), yaw:Math.PI, speed:3.25, jumpVel:4.95, airJumps:1
+  },
+  {
+    name:'Nebulosa', role:'Protagonista jogável · investigação e câmera',
+    canon:['Cabelo longo preto','Mecha vermelha','Jaqueta oversized','Saia preta','Câmera e acessórios'],
+    model:createNebulosa(), pos:new THREE.Vector3(1.1,0,-2.4), yaw:Math.PI, speed:3.05, jumpVel:4.8, airJumps:1
+  }
+];
+for (const c of characters) {
+  c.model.position.copy(c.pos);
+  c.model.add(createShadowDisk(c.name==='HellBoy'?0.7:0.73));
+  c.vertical = 0; c.air = 0; c.jumpsUsed = 0; c.step = 0;
+  scene.add(c.model);
+}
+
+function updateCard(){
+  const c = characters[state.active];
+  charNameEl.textContent = c.name;
+  charRoleEl.textContent = c.role;
+  canonEl.innerHTML = c.canon.map(x=>'• '+x).join('<br/>');
+}
+updateCard();
+
+const floorY = 0;
+const blockers = [
+  {x:0,z:-2.4,r:3.15}, // round stage only blocks center slightly when not on it
+];
+
+function clampToRoom(pos){
+  pos.x = THREE.MathUtils.clamp(pos.x,-7.9,7.9);
+  pos.z = THREE.MathUtils.clamp(pos.z,-7.9,7.9);
+}
+
+const clock = new THREE.Clock();
+let lastT = performance.now();
+let lookId = null, lastLookX = 0, lastLookY = 0;
+let padId = null;
+const padEl = document.getElementById('pad');
+const knobEl = document.getElementById('knob');
+function setPad(x,y){
+  const max=42; const len=Math.hypot(x,y)||1; const f=Math.min(1,max/len); const px=x*f, py=y*f;
+  state.padX = px/max; state.padY = py/max; knobEl.style.transform = `translate(${px}px,${py}px)`;
+}
+padEl.addEventListener('pointerdown',e=>{padId=e.pointerId; padEl.setPointerCapture(e.pointerId); const r=padEl.getBoundingClientRect(); setPad(e.clientX-r.left-r.width/2, e.clientY-r.top-r.height/2);});
+padEl.addEventListener('pointermove',e=>{ if(e.pointerId!==padId)return; const r=padEl.getBoundingClientRect(); setPad(e.clientX-r.left-r.width/2, e.clientY-r.top-r.height/2);});
+function clearPad(e){ if(e.pointerId===padId){ padId=null; setPad(0,0); } }
+padEl.addEventListener('pointerup',clearPad); padEl.addEventListener('pointercancel',clearPad);
+renderer.domElement.addEventListener('pointerdown',e=>{ if(!state.started) return; if(lookId!==null) return; lookId=e.pointerId; lastLookX=e.clientX; lastLookY=e.clientY; renderer.domElement.setPointerCapture(e.pointerId); });
+renderer.domElement.addEventListener('pointermove',e=>{ if(e.pointerId!==lookId) return; state.camYaw -= (e.clientX-lastLookX)*0.005; state.camPitch = THREE.MathUtils.clamp(state.camPitch + (e.clientY-lastLookY)*0.003, -0.08, 0.82); lastLookX=e.clientX; lastLookY=e.clientY; });
+function clearLook(e){ if(e.pointerId===lookId) lookId=null; }
+renderer.domElement.addEventListener('pointerup',clearLook); renderer.domElement.addEventListener('pointercancel',clearLook);
+
+function toggleShowcase(force){
+  state.showcase = force ?? !state.showcase;
+  document.getElementById('modeBtn').textContent = state.showcase ? 'MODO JOGAR' : 'MODO SHOWCASE';
+  hintEl.textContent = state.showcase ? 'Showcase: a câmera gira em torno do personagem para inspecionar melhor o visual.' : 'Modo jogar: ande, corra, pule e troque de personagem.';
+  refreshStats();
+}
+function switchCharacter(){
+  state.active = 1-state.active;
+  updateCard();
+}
+function resetPositions(){
+  characters[0].pos.set(-1.1,0,-2.4); characters[1].pos.set(1.1,0,-2.4);
+  for(const c of characters){ c.vertical=0; c.air=0; c.jumpsUsed=0; c.yaw=Math.PI; c.model.position.copy(c.pos); }
+}
+function cycleGraphics(){
+  const order=['AUTO','ECO','NORMAL','DETALHES'];
+  applyGraphics(order[(order.indexOf(state.graphics)+1)%order.length]);
+  refreshStats();
+}
+function doJump(){
+  const c = characters[state.active];
+  if(c.air===0){ c.vertical = c.jumpVel; c.air = 0.001; c.jumpsUsed = 1; }
+  else if(c.jumpsUsed < 2){ c.vertical = c.jumpVel * 0.96; c.jumpsUsed += 1; }
+}
+function refreshStats(){
+  statsEl.innerHTML = `FPS: ${state.fps||'--'}<br/>Gráficos: ${state.graphics}<br/>Modo: ${state.showcase ? 'SHOWCASE' : 'JOGAR'}`;
+}
+function toggleReport(){
+  const c = characters[state.active];
+  reportEl.classList.toggle('show');
+  reportEl.innerHTML = `<b>RELATÓRIO RÁPIDO</b><br/>Personagem: ${c.name}<br/>FPS: ${state.fps||'--'}<br/>Gráficos: ${state.graphics}<br/>Modo: ${state.showcase?'SHOWCASE':'JOGAR'}<br/>Posição: ${c.pos.x.toFixed(2)}, ${c.pos.z.toFixed(2)}<br/>Altura: ${(c.air||0).toFixed(2)}<br/>Saltos usados: ${c.jumpsUsed}`;
+}
+
+window.addEventListener('keydown',e=>{
+  if(['Space','Tab','ShiftLeft','ShiftRight','KeyT','KeyG'].includes(e.code)) e.preventDefault();
+  if(e.repeat && ['Tab','KeyT','KeyG','Space'].includes(e.code)) return;
+  state.input.add(e.code);
+  if(e.code==='Tab') switchCharacter();
+  if(e.code==='Space') doJump();
+  if(e.code==='KeyT') toggleShowcase();
+  if(e.code==='KeyG') cycleGraphics();
+  if(e.code==='KeyR') resetPositions();
+});
+window.addEventListener('keyup',e=>state.input.delete(e.code));
+window.addEventListener('blur',()=>{state.input.clear();state.sprint=false;});
+
+document.getElementById('switchBtn').onclick = switchCharacter;
+document.getElementById('switchTouchBtn').onclick = switchCharacter;
+document.getElementById('modeBtn').onclick = ()=>toggleShowcase();
+document.getElementById('modeTouchBtn').onclick = ()=>toggleShowcase();
+document.getElementById('graphicsBtn').onclick = cycleGraphics;
+document.getElementById('graphicsTouchBtn').onclick = cycleGraphics;
+document.getElementById('resetBtn').onclick = resetPositions;
+document.getElementById('reportBtn').onclick = toggleReport;
+document.getElementById('reportTouchBtn').onclick = toggleReport;
+document.getElementById('runBtn').addEventListener('pointerdown', ()=> state.sprint=true);
+for(const ev of ['pointerup','pointercancel','pointerleave']) document.getElementById('runBtn').addEventListener(ev, ()=> state.sprint=false);
+document.getElementById('jumpBtn').onclick = doJump;
+document.getElementById('startBtn').onclick = ()=>{ state.started=true; document.getElementById('overlay').style.display='none'; toggleShowcase(false); clock.start(); };
+document.getElementById('startShowcaseBtn').onclick = ()=>{ state.started=true; document.getElementById('overlay').style.display='none'; toggleShowcase(true); clock.start(); };
+
+function animateCharacter(c, dt, moving){
+  c.step += moving ? dt*8.5*(state.sprint?1.4:1) : dt*2.2;
+  const bob = moving ? Math.abs(Math.sin(c.step))*0.05 : 0;
+  if (c.userData) {};
+  c.model.position.y = c.air + bob;
+  if(c.name==='HellBoy'){
+    const {armL,armR,upperL,upperR,lowerL,lowerR} = c.model.userData;
+    const swing = moving ? Math.sin(c.step) * 0.45 : Math.sin(c.step*0.5)*0.05;
+    armL.rotation.x = swing; armR.rotation.x = -swing;
+    upperL.rotation.x = -swing*0.7; upperR.rotation.x = swing*0.7;
+    lowerL.rotation.x = Math.max(0,swing)*0.2; lowerR.rotation.x = Math.max(0,-swing)*0.2;
+  } else {
+    const {armL,armR,legL,legR} = c.model.userData;
+    const swing = moving ? Math.sin(c.step)*0.35 : Math.sin(c.step*0.6)*0.04;
+    armL.rotation.x = swing; armR.rotation.x = -swing;
+    legL.rotation.x = -swing*0.55; legR.rotation.x = swing*0.55;
+  }
+}
+
+function updateMovement(dt){
+  const c = characters[state.active];
+  const other = characters[1-state.active];
+  let moving = false;
+  if(!state.showcase){
+    let ix = (state.input.has('KeyD')?1:0) - (state.input.has('KeyA')?1:0) + state.padX;
+    let iz = (state.input.has('KeyS')?1:0) - (state.input.has('KeyW')?1:0) + state.padY;
+    const mag = Math.hypot(ix, iz);
+    state.sprint = state.sprint || state.input.has('ShiftLeft') || state.input.has('ShiftRight');
+    if(mag > 0.08){
+      moving = true;
+      ix /= Math.max(1, mag); iz /= Math.max(1, mag);
+      const cs = Math.cos(state.camYaw), sn = Math.sin(state.camYaw);
+      const dx = (ix*cs + iz*sn) * (state.sprint ? c.speed*1.56 : c.speed) * dt;
+      const dz = (iz*cs - ix*sn) * (state.sprint ? c.speed*1.56 : c.speed) * dt;
+      c.pos.x += dx; c.pos.z += dz; clampToRoom(c.pos);
+      c.yaw = Math.atan2(-dx, -dz);
+    }
+    const dist = other.pos.distanceTo(c.pos);
+    if(dist > 1.9){
+      const dir = new THREE.Vector3().subVectors(c.pos, other.pos).normalize();
+      other.pos.addScaledVector(dir, Math.min(dt*2.1, dist-1.9));
+      other.yaw = Math.atan2(-dir.x, -dir.z);
+    }
+  } else {
+    moving = false;
+    c.yaw += dt*0.85;
+  }
+  for(const ch of characters){
+    if(ch.air > 0 || ch.vertical !== 0){
+      ch.vertical -= 10.6 * dt;
+      ch.air += ch.vertical * dt;
+      if(ch.air <= 0){ ch.air = 0; ch.vertical = 0; ch.jumpsUsed = 0; }
+    }
+    animateCharacter(ch, dt, ch===c ? moving : false);
+    ch.model.position.x = ch.pos.x;
+    ch.model.position.z = ch.pos.z;
+    ch.model.rotation.y = ch.yaw;
+  }
+}
+
+function updateCamera(dt){
+  const c = characters[state.active];
+  if(state.showcase){
+    const target = c.pos.clone().add(new THREE.Vector3(0,2.15,0));
+    const angle = performance.now()*0.00025;
+    const camPos = target.clone().add(new THREE.Vector3(Math.sin(angle)*3.4, 1.25, Math.cos(angle)*3.4));
+    camera.position.lerp(camPos, 0.08);
+    camera.lookAt(target);
+  } else {
+    const target = c.pos.clone().add(new THREE.Vector3(0,1.95,0));
+    const r = 4.35*Math.cos(state.camPitch);
+    const camPos = target.clone().add(new THREE.Vector3(Math.sin(state.camYaw)*r, 2.2+2.9*Math.sin(state.camPitch), Math.cos(state.camYaw)*r));
+    camPos.x = THREE.MathUtils.clamp(camPos.x,-8,8); camPos.z = THREE.MathUtils.clamp(camPos.z,-8,8);
+    camera.position.lerp(camPos, Math.min(1, dt*8));
+    camera.lookAt(target);
+  }
+}
+
+function tick(){
+  requestAnimationFrame(tick);
+  if(!state.started) { renderer.render(scene,camera); return; }
+  const dt = Math.min(clock.getDelta(), 0.045);
+  updateMovement(dt); updateCamera(dt);
+  renderer.render(scene,camera);
+  state.fpsAccum += dt; state.fpsFrames += 1;
+  if(state.fpsAccum > 0.35){ state.fps = Math.round(state.fpsFrames / state.fpsAccum); state.fpsAccum = 0; state.fpsFrames = 0; refreshStats(); if(reportEl.classList.contains('show')) toggleReport(), toggleReport(); }
+}
+
+window.addEventListener('resize',()=>{
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight, false);
+});
+refreshStats();
+camera.position.set(0.8,2.7,5.2); camera.lookAt(0,2,-2.4);
+tick();
+</script>
+</body>
+</html>
