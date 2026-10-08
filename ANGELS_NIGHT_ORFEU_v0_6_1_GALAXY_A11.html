@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#07060e" />
+    <title>ANGELS NIGHT — Orfeu v0.6.1 (otimização Galaxy A11)</title>
+  <style>
+:root { color-scheme: dark; font-family: Inter, system-ui, -apple-system, sans-serif; color: #f0edf6; background: #07060e; }
+* { box-sizing: border-box; }
+body { margin: 0; touch-action: none; user-select: none; -webkit-user-select: none; overflow: hidden; }
+button { font: inherit; cursor: pointer; touch-action: manipulation; }
+#app, #render-root { position: fixed; inset: 0; overflow: hidden; }
+#render-root canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+#hud { position: fixed; z-index: 2; left: 18px; right: 18px; top: 18px; display:flex; gap:20px; align-items: start; justify-content:space-between; pointer-events:none; }
+.brand { font-size: clamp(16px, 2.3vw, 24px); font-weight: 950; letter-spacing: .08em; text-shadow: 0 1px 10px #000; }
+.brand span { color:#f04e88; }
+.brand small { display:block; font-size:9px; letter-spacing:.14em; color:#a9a2b3; margin-top:4px; }
+#mission { padding: 8px 12px; max-width: 295px; background:#0b0914bb; border:1px solid #9381ad44; border-radius: 9px; text-align:right; font-size:11px; }
+#mission b { color:#f3a4c7; display:block; font-size:10px; letter-spacing:.13em; margin-bottom:3px; }
+#mission span { color:#e0d9e8; }
+#status { position: fixed; z-index:2; left:20px; bottom:22px; display:flex; flex-direction:column; gap:4px; pointer-events:none; }
+#character-name { font-weight:800; font-size:16px; color:#fff; text-shadow:0 2px 12px #000; }
+#hint { color:#c6becd; font-size:10px; }
+#footer { position:fixed; z-index:1; bottom:7px; right:16px; font-size:9px; color:#aea3beaa; letter-spacing:.09em; pointer-events:none; }
+#interact-hint { position: fixed; z-index:3; left:50%; bottom:16%; transform:translateX(-50%); background:#1d1423ed; border:1px solid #fa5fa47b; border-radius:9px; padding:9px 18px; color:#fff; font-size:13px; box-shadow:0 5px 20px #0006; pointer-events:none; }
+.hidden { display:none !important; }
+#dialog { position:fixed; z-index:8; left:50%; bottom:6%; transform:translateX(-50%); width:min(600px,93vw); padding:18px; border-radius:16px; border:1px solid #9d5078aa; background:linear-gradient(145deg, #17111ff5, #090914f5); box-shadow:0 18px 50px #000b; }
+#dialog-name { font-weight:800; font-size:13px; color:#f6aacb; text-transform:uppercase; letter-spacing:.1em; }
+#dialog-line { line-height:1.5; font-size:14px; margin:11px 0 16px; }
+#dialog-options { display:flex; gap:8px; flex-wrap:wrap; }
+#dialog-options button { color:#fff; background:#642144; border:1px solid #a94b79; border-radius:8px; padding:10px 12px; font-size:12px; }
+#start-overlay { position:fixed; z-index:10; inset:0; display:grid; place-items:center; background: radial-gradient(circle at 60% 40%,#40192dc9,#05050cef 72%); padding:24px; }
+.start-panel { width:min(530px,100%); text-align:center; }
+.eyebrow { letter-spacing:.24em; font-size:11px; color:#ff8db9; }
+.start-panel h1 { font-weight:900; font-size:clamp(60px,11vw,102px); line-height:1; letter-spacing:.18em; text-indent:.18em; margin:14px 0; text-shadow:0 0 35px #ab1a6c99; }
+.start-panel p { color:#ded5e5; line-height:1.5; font-size:14px; }
+.start-panel p.notice { color:#f5bfce; font-size:12px; }
+#start-button { background:#e44280; color:#fff; padding:14px 24px; margin-top:14px; border:0; border-radius:10px; font-weight:800; letter-spacing:.06em; }
+#touch-ui { display:none; pointer-events:none; position:fixed; z-index:5; inset:0; }
+#touch-ui.enabled { display:block; }
+#move-pad { pointer-events:auto; position:absolute; left:28px; bottom:42px; height:124px; width:124px; border-radius:50%; background:#3a2b4a77; border:2px solid #c7acc666; touch-action:none; }
+#move-knob { position:absolute; top:38px; left:38px; height:44px; width:44px; border-radius:50%; background:#d29bb9bb; border:1px solid #fff6; touch-action:none; }
+#touch-buttons { position:absolute; right:20px; bottom:33px; display:grid; grid-template-columns:repeat(4, minmax(54px,69px)); grid-template-areas:"run dodge attack interact" "switch jump lens interact"; gap:7px; pointer-events:auto; }
+#touch-buttons button { border:1px solid #e8b0d099; color:#fff; border-radius:14px; background:#4b264caa; min-width:73px; padding:12px 10px; font-size:10px; font-weight:800; }
+#run-button { grid-area:run; }
+#dodge-button { grid-area:dodge; background:#3b4275bb!important; }
+#attack-button { grid-area:attack; background:#782642bb!important; }
+#run-button.on { background:#0a716fbb; border-color:#81ffed; }
+#lens-button { grid-area:lens; }
+#switch-button { grid-area:switch; }
+#jump-button { grid-area:jump; background:#1e5671bb!important; border-color:#8bdffa!important; }
+#jump-button:disabled { opacity:.42; }
+#interact-button { grid-area:interact; }
+#error-box { position:fixed; z-index:20; left:8px; right:8px; top:15px; background:#701b1b; color:#fff; padding:15px; border-radius:9px; }
+@media (max-height:500px) { #hud{top:7px;left:11px;right:11px} #status{left:169px;bottom:6px;} #move-pad{bottom:15px;left:16px;width:100px;height:100px;} #move-knob{top:29px;left:29px;} #touch-buttons{bottom:15px;right:12px;} #dialog{bottom:3%;padding:10px 12px;} #dialog-line{margin:6px 0 8px;font-size:12px;} #footer{display:none;} }
+
+#lens-badge{position:fixed;z-index:4;top:71px;left:50%;transform:translateX(-50%);background:#083747d9;border:1px solid #52ddf0;padding:8px 13px;border-radius:20px;color:#c5faff;font-weight:800;font-size:11px;letter-spacing:.04em;pointer-events:none}
+#lens-button.on{background:#096580 !important;border-color:#7aeaff !important}
+#stage-award{font-size:10px;color:#f2c88c;text-shadow:0 2px 7px #000;font-weight:700}
+#jump-status{font-size:11px;color:#91eaff;font-weight:800;text-shadow:0 2px 5px #000}
+#restart-button.secondary-action{background:transparent;border:1px solid #a28fa6;padding:12px 17px;margin-left:8px;font-size:12px;color:#eee}
+@media(max-width:760px){#mission{max-width:185px;font-size:10px} .brand{font-size:15px} #status{bottom:10px} #hint{display:none} #footer{display:none}}
+@media(max-height:500px){#lens-badge{top:42px;font-size:9px;padding:5px}#status{bottom:2px}}
+
+#character-portrait{position:fixed;top:62px;left:16px;width:52px;height:52px;z-index:2;border:2px solid #e57eaa9c;border-radius:12px;background:#120f17 center /cover no-repeat;box-shadow:0 3px 18px #0009;pointer-events:none}
+#air-state{position:fixed;z-index:4;top:72px;left:50%;transform:translateX(-50%);color:#caebff;font:800 11px system-ui;letter-spacing:.09em;pointer-events:none;text-shadow:0 2px 9px #000}
+@media(max-height:500px){#character-portrait{top:39px;left:8px;width:40px;height:40px}#air-state{top:42px;font-size:9px}}
+#action-panel{position:fixed;z-index:3;left:50%;top:8px;transform:translateX(-50%);padding:7px 12px;max-width:70vw;border:1px solid #c66783;background:#160c18de;color:#fff2f6;border-radius:11px;font:700 11px system-ui;text-align:center;pointer-events:none}
+#action-stats{font-size:10px;color:#ffd3e5;font-weight:700;text-shadow:0 2px 6px #000}
+#toast{position:fixed;z-index:9;left:50%;top:27%;transform:translateX(-50%);min-width:180px;max-width:75vw;background:#24101fe8;border:1px solid #e26aa6;border-radius:10px;padding:10px 14px;text-align:center;font:750 12px system-ui;color:#ffe9f3;pointer-events:none;box-shadow:0 9px 35px #0007}
+#training-hud{position:fixed;z-index:3;right:14px;top:109px;padding:7px 10px;border-radius:8px;background:#120d1bcc;border:1px solid #cd6577;color:#ffe8ef;font:700 10px system-ui;pointer-events:none}
+#training-hud span{color:#ffa5bb}
+@media(max-height:500px){#action-panel{top:3px;padding:4px 7px;font-size:10px}#training-hud{top:62px;right:10px;padding:4px 7px}#toast{top:20%}#touch-buttons{gap:6px;right:7px;bottom:11px;grid-template-columns:repeat(4,minmax(51px,63px))}#touch-buttons button{min-width:0;padding:10px 4px;font-size:9px}}
+#fps-counter{position:fixed;z-index:2;right:14px;top:76px;font:700 10px system-ui;color:#c9c3d6c9;background:#090b16a8;padding:4px 7px;border-radius:5px;pointer-events:none}
+#camera-frame{position:fixed;inset:12% 13%;border:2px solid #55dded8c;border-radius:18px;pointer-events:none;z-index:3;box-shadow:inset 0 0 45px #40bed51a}
+#camera-frame:before{content:'REC  ●   ANOMALIAS';position:absolute;top:8px;left:11px;color:#b9f9ff;font:700 11px system-ui;letter-spacing:.12em}
+#camera-frame:after{content:'CAM-01 · NEBULOSA';position:absolute;bottom:8px;right:11px;color:#b9f9ff;font:700 9px system-ui;letter-spacing:.1em}
+@media(max-height:500px){#fps-counter{top:42px;right:10px}#camera-frame{inset:10% 15%}}
+#quality-button{position:fixed;z-index:5;right:80px;top:72px;padding:6px 9px;font:700 10px system-ui;border-radius:7px;border:1px solid #815d83;background:#22192ebd;color:#ffe2ed;touch-action:manipulation}
+@media(max-height:500px){#quality-button{top:39px;right:75px;padding:4px 6px;font-size:9px}#training-hud{top:91px}}
+
+@media(orientation:portrait){#portrait-tip{display:block!important}}
+#portrait-tip{display:none;position:fixed;bottom:6px;left:50%;transform:translateX(-50%);background:#120d18bc;padding:4px 11px;border:1px solid #725871;border-radius:8px;color:#f1a6c0;font:700 10px system-ui;z-index:7;white-space:nowrap;pointer-events:none}
+</style>
+</head>
+  <body>
+    <div id="app">
+      <div id="render-root"></div>
+      <header id="hud">
+        <div class="brand">ANGELS <span>NIGHT</span><small>ORFEU · OTIMIZAÇÃO GALAXY A11 v0.6.1</small></div>
+        <div id="mission"><b>MISSÃO: ECO DO ORFEU</b><span>Explore o salão e interaja com as marcações.</span></div>
+      </header>
+      <section id="status"><span id="character-name">HellBoy (provisório)</span><span id="hint">WASD · ⇧ SHIFT CORRER · ESPAÇO 2× · Q ESQUIVA · F ATACAR · TAB</span><span id="jump-status" aria-live="polite">SALTOS: 2/2</span><span id="stage-award">SEGREDO DO PALCO: 0/1</span><span id="action-stats">⇧ SHIFT: CORRER · VIDA: 100 · ESQUIVA: PRONTA</span></section>
+      <div id="interact-hint" class="hidden">E · Interagir</div>
+      <div id="fps-counter">FPS: --</div>
+      <button id="quality-button" type="button" aria-label="Alterar qualidade gráfica">GRÁFICOS: AUTO</button>
+      <div id="action-panel" class="hidden"></div><div id="training-hud" class="hidden"></div><div id="toast" class="hidden" aria-live="polite"></div>
+      <div id="character-portrait" aria-hidden="true"></div>
+      <div id="air-state" aria-live="polite" class="hidden"></div>
+      <div id="portrait-tip">↻ Gire o celular para jogar na horizontal</div>
+      <div id="camera-frame" class="hidden"></div>
+      <div id="lens-badge" class="hidden" aria-live="polite">◉ LENTE INVESTIGATIVA ATIVA</div>
+      <div id="dialog" class="hidden" role="dialog" aria-label="Conversa">
+        <div id="dialog-name"></div><p id="dialog-line"></p>
+        <div id="dialog-options"></div>
+      </div>
+      <div id="start-overlay">
+        <div class="start-panel">
+          <p class="eyebrow">ANGELS NIGHT · LOVE AND DRUGS</p>
+          <h1>ORFEU</h1>
+          <p>Corra segurando ⇧ SHIFT (tecla abaixo do Caps Lock), pule duas vezes com ESPAÇO, esquive com Q e ataque com F. Treino opcional disponível perto da entrada. No celular, use os botões na tela.</p>
+          <p class="notice">Modelos 3D estilizados de protótipo — ainda não são os rostos oficiais da série.</p>
+          <button id="start-button">ENTRAR NO ORFEU</button>
+          <button id="restart-button" class="secondary-action">REINICIAR MISSÃO</button>
+        </div>
+      </div>
+      <div id="touch-ui">
+        <div id="move-pad"><div id="move-knob"></div></div>
+        <div id="touch-buttons"><button id="run-button" aria-label="Correr enquanto pressionado">CORRER</button><button id="dodge-button" aria-label="Esquivar">ESQUIVA</button><button id="attack-button" aria-label="Atacar">ATACAR</button><button id="lens-button" aria-label="Lente fotográfica">LENTE</button><button id="switch-button" aria-label="Trocar personagem">TROCAR</button><button id="jump-button" aria-label="Saltar ou realizar salto duplo">PULAR</button><button id="interact-button" aria-label="Interagir">INTERAGIR</button></div>
+      </div>
+      <footer id="footer">MISSÃO JOGÁVEL 0.6.1 · GRÁFICOS AJUSTÁVEIS</footer>
+      <div id="error-box" class="hidden"></div>
+    </div>
+    <script type="module">
+let THREE;
+try {
+  THREE = await import('https://cdn.jsdelivr.net/npm/three@0.175.0/build/three.module.js');
+} catch (firstError) {
+  try { THREE = await import('https://unpkg.com/three@0.175.0/build/three.module.js'); }
+  catch (secondError) {
+    const msg = document.getElementById('error-box');
+    msg.textContent = 'Não foi possível carregar o motor 3D. Conecte-se à internet e recarregue a página.';
+    msg.classList.remove('hidden');
+    throw secondError;
+  }
+}
+
+
+// Technical sandbox. All humanoids are geometry placeholders, NOT canonical 3D likenesses.
+const root = document.getElementById('render-root');
+// Low-end Android profile: intentionally conservative for Galaxy A11-class hardware.
+const lowEnd = /Android/i.test(navigator.userAgent) || (navigator.deviceMemory && navigator.deviceMemory <= 3);
+// A versão anterior limitava a 30 FPS com um limiar de 33,33 ms.
+// Em telas de 60 Hz isso podia pular 3 quadros e registrar ~20–24 FPS.
+// Solução: atualizar a cada requestAnimationFrame e ajustar a resolução se necessário.
+const frameInterval = 0;
+const qualityPresets = [
+  {id:'auto', label:'AUTO', ratio:lowEnd ? 0.72 : 1.0},
+  {id:'eco', label:'ECO', ratio:lowEnd ? 0.54 : 0.72},
+  {id:'normal', label:'NORMAL', ratio:lowEnd ? 0.74 : 1.0},
+  {id:'detail', label:'DETALHES', ratio:lowEnd ? 0.88 : 1.25}
+];
+let qualityIndex=0;
+try {const choice=localStorage.getItem('angels-night-graphics-v061');qualityIndex=Math.max(0,qualityPresets.findIndex(x=>x.id===choice));}catch(_){ /* storage opcional */ }
+let currentRenderRatio=qualityPresets[qualityIndex].ratio;
+let slowWindows=0;
+const STORAGE_KEY = 'angels-night-orfeu-quest-v02'; // manter progresso da versão anterior
+let lastDraw = performance.now();
+let fpsAccum = 0, fpsFrames = 0;
+const ui = {
+  start: document.getElementById('start-overlay'),
+  char: document.getElementById('character-name'),
+  fps: document.getElementById('fps-counter'),
+  quality: document.getElementById('quality-button'),
+  hint: document.getElementById('interact-hint'),
+  mission: document.querySelector('#mission span'),
+  dialog: document.getElementById('dialog'),
+  dialogName: document.getElementById('dialog-name'),
+  dialogLine: document.getElementById('dialog-line'),
+  options: document.getElementById('dialog-options'),
+  pad: document.getElementById('move-pad'),
+  knob: document.getElementById('move-knob'),
+  touch: document.getElementById('touch-ui'),
+  jumpStatus: document.getElementById('jump-status'),
+  jumpButton: document.getElementById('jump-button'),
+  award: document.getElementById('stage-award'),
+  portrait: document.getElementById('character-portrait'),
+  airState: document.getElementById('air-state'),
+  actionStats: document.getElementById('action-stats'),
+  actionPanel: document.getElementById('action-panel'),
+  trainingHud: document.getElementById('training-hud'),
+  toast: document.getElementById('toast'),
+  runButton: document.getElementById('run-button'),
+  error: document.getElementById('error-box')
+};
+const state = {
+  started: false,
+  active: 0,
+  dialog: false,
+  sprint: false,
+  toastTimer: 0,
+  lookYaw: 0,
+  lookPitch: 0.21,
+  input: new Set(),
+  padX: 0,
+  padY: 0,
+  seen: new Set(),
+  quest: 0,
+  award: false,
+  lens: false
+};
+// Dois impulsos por ciclo de aterrissagem. A física usa segundos, não frames.
+const JUMP_SPEED = 6.7;
+const GRAVITY = 18.5;
+const JUMP2_SPEED = 6.1;  // segundo impulso mais controlado
+const EPS = 0.08;
+const PORTRAITS = { hell: 'data:image/webp;base64,UklGRsgDAABXRUJQVlA4ILwDAAAwGwCdASqQAJAAPqlSpE0mJKOipZbY8MAVCWcA1DzwIpv41CX2C0EVaXIOH4S/mCcFG2ZhXSkqKj/NmPc/H2+XqGMpAIB5ohBmvEM119MXWGhCZeOUlXyozCl3jPOTvmOPkzCnRU+5kWqEuZ4aGkIj0dgU8RHfJDxhBkGT6uKvuaNv+jQ7AU0dmTvW2fXhqDd0ogF5grvNWb+ZkknHaR9jv5eB2+M077DQZIXx4fCa95sStrE2C6U36LsbMIop8R1HsDL/atRqgUJXnT2agY1N8qrUzJFIviMdZg+wEvUhe7VAAP74ll7O5KNZoCnv0FGbDwUQ//zf10TDpKaWyeE/uiyaNctBudSILUh5QeylysoUhM2pQU4FaY4t/IwSxk09kYeDV4DbJpu4ElGt8v0OloDbgKWzJ70yeFEl8VZjAF9xiSOzar4XGOgzUOBGdWDzpu7pKX1QhvjXeXb/jnr5piUNk7/GjyXgbkfEYRcK1lp935wuM+xViijzZOMkwdcypaQfFbwliLAG8u3dj69CiLqCvP2zscI2NDU5BJ0ifOvnRkFHIo6WBrDATxKy/D27O50ACjZc2AdBb84KmxeHr6iGBC4ndV5yd96GoOAKSDLy7EHTG24Do32YpNSpAptr3mP/ufJGiDZ92aOww9GTW1UxEvfEoE4J7jgBO+UFZOHlxlzJZa0j0ZhFASUH5iXqKJ8n4ySgId6eXvyMqHW+xzHnlKOlfaM9WJ54IX1Otn67QZSKKuxA2HQ1C8HXRDfiC3Wo4BLfC0mSB5VUio4wXd268/EfgT3ecXYT7x2A5jwejuEsoTkVoeZ6J7S0KYbilOI49b6O2j9ArA0+RW5LWga5u+NMXrMU4SowmbWU6mL5wiSjScXSvZ1zAbtOTHIh8CTwBQjMrV6gBRUJZQ2LTCXfECce39rnLQE5DV+qhh9ui/TmsqvnVqg/9lzy69w6BcTNECTVtMSqPC6YL3D+D9CslB2DfFXT1ea5KOZYQt1MSk4JD/yIrpVjkN5EwMYc+SNyEqx0JEpATI1z9NrPbC+vwnNvgbYhfd2gBM7Y9JB/VU1dUQcc7Lg4Xs7j/2Rj4FlibHFwy0itDMeRhkHlsn9A+3c/wdirShncS6YT/biiIRtQh5R/++ZG0xUjxiFdYgkWoaL8/i/d0QWVlTM1pYen8Bf1PzK17JHBeLNHv5Ox4tcYKJv63MV4XOZQq38bXy5/mYhvjc27raxIOprpkfrYf2Xs3Zg4UJtA+TVB4y5rRIHrqAuvmAAAAA==', neb: 'data:image/webp;base64,UklGRtwGAABXRUJQVlA4INAGAAAQJwCdASqQAJAAPqlQoUymJKMiJlMKkMAVCWUA1K3XvgRUzKq4Ytn11guOCiauaFFzY57qiTu4zEo4EmuD+IOHV+UuTfMLoHWM6iUux0PtoQ5w0vuQ5pwv8H7SqEiJ7r4rVIg3CAxDUXYQSqVrRz+/5/3Khyl6mP6bIPE4FJK/3yZC1JVBo8dS8UqXGJrKGaV9SrSHuczVmxeVK6tJyhCCeMlP3ukLxXUQXHlQinLe1vvZ5McyJCVdQKO1XfL9yR4UNdnEp2sNARpo5i5ambBg9HFUglu/5nWdX63IAFnCmspIY3O6Z2kLU5B9a2rkd9EB/epJUZvwVz4lGN/qzr9KdD+XjXqFTwH4f+jn3BD7Rt+38Y493I7ycDE/AkYzX2P1o6QWDUioyIeVhC6v3LBtmG2iCMP0pdsibgGO98WvzAAA/vxc2o20VFCQPhDVne8HywisP1zbRBB79/ZG/F8olJywGsrHkJ4Gb2md0/sUDu0vem5RY9NyN2WNr9KV1dfolPAOvcuF9xol8Idr5ZyKVY2oNEIG284It+mARVMnEkm5qLMK2+ahn3usDSffBAywT+61mZucSt0w7fDe8+RWEoZkU9z0P+a4SdJ/V1DWzuSd44e1/njkLHoiA+Ag9088jFvc945fb0xa32bf7+Or/K6tC4FbJ8ueSoPAdlcB9UyW2JJ1C3Jv9r4V/+g7j9kgh7LhSi8QlcIpM/GOwldBcZ8N4AJcuY6q2yadd1dc/+bz/m4cYKa59Kogu+lJWRuwagfrGTe5uHRdQwuAWEduADdV4aOCt5+ACN8UZVgCjzfgOQ5Dp6hNmPg+AC9+V82Epdg8UMSpIMH1Zm3lkPfnt8zW0ydFJbcazkVR/sGXUAWA/x2zzdV71LfrjFT7ef52SseXiGEStHvNiUG5ukv35fkHqDKSJeZFZTvWvlAwZXr7mgj6Gi49+RIRlw7norPA/gJBLebZ/FnnhV1tpklAd5pvOEt8GGwQ/qsr2Ih0Yy93AjuZY0fLxg5fzyinzi/l8XnnQLrJ9H7Cyt9x7bwobiAB0JWGEaJcy4AL7ORUqALJycjFt4UETsXkwjs990F4DjkGdkQuE/RMnbmgwUihVwdvcAD6DAqjxrwfFq9LM0xVFP1E7JBZvlzsL4HjG6f2w7pNIIWy7+1dp1ZOf8W7cqaxWcYygzaJnTGbDT9+7k/LLHs09uLHxlbj6OGcH5yHybqBR/fHJh6LefiLxm1ZqfogMiSc/w7f8noSTPq/fsvJQQ2hawFh+pShG2SnngfZcB7s7XCDd0QwTYFFN3kvLiaDOnIB3h3Z/dYoKT3illUyP5r0G0vwtznHL7qnmajeyHCcFv/hSFy+Ikgo7L7W7TwBT/+fxmr9AZLvblixTP44OjNM+GGoFXr3pOa6EvLDewipKdArA34bwfK40xTxA/ZchY5r9LWi4kR5doWTX5cfRJmeDrMQPAJzFCfZ2HSSAOUVZDRZlpihufYzD4JHACq7/BrtiQgNc4U6kEdnnVIqtgRa9Gbqfbx7IQH3AZu91c/1p96q3XlCmncDsxd4BbagUeDDALB+g+zAyg3wvgQEoQUhUq9OGBO68U1PTPTeQeuTjri9cHYjZQzOdCQAcR6FhRUdycg7Rhnag1TatCDcDEqDTEhHRK8ikZypfyAczsaQ27e/PaEUv2KohU1r1oZ2raxDIjThlfYpQuIP4SxZYkZ5EAaWgPmMdzvfE5XHNIJzFYS7HmBhqekBefK/UX1Ypy5KTJ/tGnOEebDsLEoHvd2TM1fM+7apodf1JxhjjFrZysUvfPQM/wjf53AinQ7HTKbOenuf91kWmTEnjx6Iw/4vx4w/p8sj531AfOrheB7HpSdI5g9QMdEa11ZV76BbeQ40aq9RtzkukxqiQ3uc81iYqPUafvH1DH/jX1YGe0sPxForEJJcWFq9Fkci1FeXXvcaPUwNKgQW7wuzgNpH1LlWqcY62d6cXTMI9ZJEEUgle+Hooo/1HuSMZQpzlODj09p1/aFYod4tZXYrHwS2/dgffxjLreop3WRjeMxVuW0D5bMCnblskBvplHnM/pNXmTxT55UbZJqcxqTS+C5Alj8j6X5NaubwfzDhh7nov3poG/25AVZ2rJmhHp5zuHB49mzbVY3j8MuKXoiLP3kfJqe5k//2cl9QtUVg2YLGGLiY3q3HQTxpR5XBfm75HVLskltbxNLbQ9fU7bGFCaf51Pn9rNdFdDPSt/UlqmqL5ChbtpkKa3aR5T6mZf+MifBwcmFN97QH3uT311lfCLcbmmk6Sqdpo8Y4IE+4TOydA7pNTOcmmVhIEtW2AAAA' };
+
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: !lowEnd, powerPreference: lowEnd ? 'low-power' : 'high-performance', precision: 'mediump' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, currentRenderRatio));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = !lowEnd;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  root.appendChild(renderer.domElement);
+} catch (err) {
+  ui.error.textContent = `Este navegador não conseguiu iniciar WebGL: ${err?.message || String(err)}`;
+  ui.error.classList.remove('hidden');
+  throw err;
+}
+function updateQualityLabel(){
+  ui.quality.textContent=`GRÁFICOS: ${qualityPresets[qualityIndex].label} ${Math.round(currentRenderRatio*100)}%`;
+}
+function setQuality(index){
+  qualityIndex=index;
+  slowWindows=0;
+  currentRenderRatio=qualityPresets[qualityIndex].ratio;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1,currentRenderRatio));
+  renderer.setSize(window.innerWidth,window.innerHeight,false);
+  updateQualityLabel();
+  try{localStorage.setItem('angels-night-graphics-v061',qualityPresets[qualityIndex].id);}catch(_){}
+}
+ui.quality.addEventListener('click',()=>setQuality((qualityIndex+1)%qualityPresets.length));
+updateQualityLabel();
+// Modelos iluminados usam shader mais simples no Android, sem cálculos PBR custosos.
+function makeLitMaterial(params){
+  if(lowEnd){const {roughness,metalness,...simpler}=params;return new THREE.MeshLambertMaterial(simpler);}
+  return new THREE.MeshStandardMaterial(params);
+}
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#070810');
+scene.fog = new THREE.FogExp2('#080810', 0.023);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.05, 110);
+scene.add(new THREE.HemisphereLight('#bec5ea', '#0d0710', 1.05));
+scene.add(new THREE.AmbientLight('#80647f', 0.2));
+const spot = new THREE.SpotLight('#e9d8f8', 32, 24, Math.PI / 4.8, 0.5, 0.7);
+spot.position.set(0, 8, -10);
+spot.target.position.set(0, 0, -10);
+spot.castShadow = true;
+scene.add(spot, spot.target);
+const redLight = new THREE.PointLight('#b61f61', 15, 12);
+redLight.position.set(6, 4, -4);
+scene.add(redLight);
+const blueLight = new THREE.PointLight('#23499d', 12, 12);
+blueLight.position.set(-7, 3, -7);
+blueLight.visible = !lowEnd; // um ponto de luz dinâmico a menos no Galaxy A11
+scene.add(blueLight);
+
+const mats = {
+  floor: makeLitMaterial({ color: '#16141c', roughness: 0.92, metalness: 0.06 }),
+  wall: makeLitMaterial({ color: '#15131c', roughness: 0.96 }),
+  stage: makeLitMaterial({ color: '#211d29', roughness: 0.8 }),
+  metal: makeLitMaterial({ color: '#44404b', roughness: 0.4, metalness: 0.8 }),
+  cloth: makeLitMaterial({ color: '#111118', roughness: 0.92 }),
+  red: makeLitMaterial({ color: '#b72243', roughness: 0.65, emissive: '#5e081d', emissiveIntensity: 0.25 }),
+  skin: makeLitMaterial({ color: '#b78367', roughness: 0.89 }),
+  pale: makeLitMaterial({ color: '#e0c7c5', roughness: 0.89 }),
+  neon: makeLitMaterial({ color: '#eb4a9b', emissive: '#db1167', emissiveIntensity: 2.4 }),
+  clue: makeLitMaterial({ color: '#45a3af', emissive: '#146d7a', emissiveIntensity: 0.8 })
+};
+function block(w, h, d, x, y, z, material = mats.wall, cast = false) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  mesh.position.set(x, y, z);
+  mesh.receiveShadow = true;
+  mesh.castShadow = cast;
+  scene.add(mesh);
+  return mesh;
+}
+function floorTile() {
+  block(23.8, 0.2, 29.8, 0, -0.16, 0, mats.floor);
+  const grid = new THREE.GridHelper(23, 23, '#4a3647', '#29202e');
+  grid.position.y = -0.045;
+  scene.add(grid);
+}
+floorTile();
+block(24, 6.8, 0.7, 0, 3.3, -15, mats.wall);
+block(24, 6.8, 0.7, 0, 3.3, 15, mats.wall);
+block(0.7, 6.8, 30, -12, 3.3, 0, mats.wall);
+block(0.7, 6.8, 30, 12, 3.3, 0, mats.wall);
+block(24, 0.35, 30, 0, 6.75, 0, mats.wall);
+block(12, 0.65, 3.2, 0, 0.3, -12.8, mats.stage, true);
+block(1.0, 4.7, 0.6, -6, 3.0, -14.4, mats.metal);
+block(1.0, 4.7, 0.6, 6, 3.0, -14.4, mats.metal);
+block(10, 0.14, 0.2, 0, 5.8, -14.57, mats.neon);
+block(5, 1.4, 2.0, 8, 0.7, -0.5, mats.stage, true);
+block(0.15, 1.3, 12, -11.2, 2.0, -4, mats.metal);
+block(8, 0.2, 0.15, 0, 1.6, 14.56, mats.neon);
+for (let x = -9; x <= 9; x += 3) {
+  const beam = block(0.1, 0.12, 27.5, x, 6.5, 0, mats.metal);
+  beam.receiveShadow = false;
+}
+for (const x of [-8.6, -4.3, 4.3, 8.6]) {
+  for (const z of [-8, 7]) {
+    // Luminares geométricas baratas: sem oito luzes dinâmicas adicionais.
+    block(0.32, 0.5, 0.32, x, 4.35, z, mats.metal);
+  }
+}
+// AABB dos obstáculos com altura real: a partir desta versão é possível pousar em superfícies.
+// platform=true significa topo caminhável, não objeto decorativo atravessável.
+const blockers = [
+  { minX:-6.0, maxX:6.0, minZ:-14.4, maxZ:-11.2, top:0.625, platform:true }, // palco
+  { minX:5.5, maxX:10.5, minZ:-1.5, maxZ:0.5, top:1.4, platform:true }   // balcão
+];
+for (const [x, z] of [[-8, 1], [-5, 1], [-8, 6]]) {
+  block(1.7, 0.18, 1.7, x, 0.86, z, mats.metal, true);
+  block(0.3, 0.83, 0.3, x, 0.42, z, mats.metal);
+  blockers.push({ minX:x-.85, maxX:x+.85, minZ:z-.85, maxZ:z+.85, top:.95, platform:true });
+}
+for (const [x, z] of [[-10.2, 2],[-10.2, -3],[10.2, -7]]) {
+  block(0.2, 2.6, 1.1, x, 1.4, z, mats.metal);
+}
+// Colisores verticais de decorações físicas próximas das paredes.
+for (const [x,z] of [[-10.2,2],[-10.2,-3],[10.2,-7]]) {
+  blockers.push({minX:x-.21,maxX:x+.21,minZ:z-.58,maxZ:z+.58,top:2.7,platform:false});
+}
+// Exit door is scenery only in this tech build; do not fake navigation that is not implemented.
+block(2.4, 3.0, 0.16, 0, 1.5, 14.56, mats.metal);
+block(1.65, 0.10, 0.16, 0, 3.25, 14.45, mats.neon);
+
+// Avatar procedural inspirado em silhuetas canônicas. NÃO é modelo facial oficial.
+const avatarMat = {
+  black: makeLitMaterial({ color: '#0a0b11', roughness: .83 }),
+  jacket: makeLitMaterial({ color: '#121118', roughness: .94 }),
+  trousers: makeLitMaterial({ color: '#15131a', roughness: .91 }),
+  sole: makeLitMaterial({ color: '#c9c4c8', roughness: .83 }),
+  silver: makeLitMaterial({ color: '#a6a5ad', metalness: .65, roughness: .4 }),
+  white: makeLitMaterial({ color: '#f1edf0', roughness: .7, side:THREE.DoubleSide }),
+  skinHell: makeLitMaterial({ color: '#a77559', roughness: .86 }),
+  skinNeb: makeLitMaterial({ color: '#e0c7ce', roughness: .85 }),
+  streak: makeLitMaterial({ color: '#ac142e', roughness: .78 }),
+  hair: makeLitMaterial({ color: '#08080c', roughness: .85 }),
+  mesh: makeLitMaterial({ color: '#3a343d', roughness: .94 }),
+  tech: makeLitMaterial({ color: '#31313c', roughness: .91 }),
+};
+function avatar(kind) {
+  const outer = new THREE.Group();
+  const body = new THREE.Group(); outer.add(body);
+  const isNeb = kind === 'neb', isTech = kind === 'tech';
+  const skin = isNeb?avatarMat.skinNeb:avatarMat.skinHell;
+  function put(geo,mat,x,y,z,parent=body) {
+    const mesh = new THREE.Mesh(geo,mat); mesh.position.set(x,y,z);
+    mesh.castShadow=!lowEnd; parent.add(mesh); return mesh;
+  }
+  function cub(w,h,d,mat,x,y,z,parent=body){return put(new THREE.BoxGeometry(w,h,d),mat,x,y,z,parent);}
+  function cyl(top,bottom,height,mat,x,y,z,segments=9,parent=body){return put(new THREE.CylinderGeometry(top,bottom,height,segments),mat,x,y,z,parent);}
+  // A personagem caminha olhando para -Z; boné, mecha e câmera têm orientação fixa.
+  cub(isNeb?.72:.79,.88,.39,avatarMat.jacket,0,1.43,0);
+  cub(isNeb?.77:.81,.19,avatarMat.black,0,1.81,-.045);
+  cyl(.145,.14,.16,skin,0,1.97,0,10);
+  put(new THREE.SphereGeometry(.255,12,10),skin,0,2.20,-.035);
+  // Face estilizada: olhos pequenos no plano frontal, sem tentar inventar um retrato definitivo.
+  const eyeMat=isNeb?avatarMat.hair:avatarMat.black;
+  for (const sign of [-1,1]) {
+    put(new THREE.SphereGeometry(.019,6,5),eyeMat,sign*.090,2.215,-.275);
+  }
+  const arms=[];
+  for (const sign of [-1,1]){
+    const arm=new THREE.Group(); arm.position.set(sign*.48,1.76,0); body.add(arm);
+    cyl(.16,.12,.76,avatarMat.jacket,0,-.38,0,9,arm);
+    cyl(.113,.10,.17,skin,0,-.81,0,9,arm);
+    arms.push(arm);
+  }
+  const legs=[];
+  for(const sign of [-1,1]){
+    const leg=new THREE.Group();leg.position.set(sign*.205,.96,0);body.add(leg);
+    cyl(isNeb?.132:.185,isNeb?.114:.17,.78,isNeb?avatarMat.mesh:avatarMat.trousers,0,-.43,0,10,leg);
+    cub(.33,.17,.46,avatarMat.black,0,-.87,-.09,leg);
+    cub(.33,.06,.46,avatarMat.sole,0,-.976,-.09,leg);
+    // Pontas dos cadarços/tênis contrastando com preto.
+    cub(.25,.017,.12,avatarMat.sole,0,-.82,-.27,leg);
+    legs.push(leg);
+  }
+  if(!isNeb && !isTech) {
+    // Boné preto obrigatório. Cabelo militar fica SOB o boné, sem mechas para fora.
+    cyl(.302,.303,.17,avatarMat.black,0,2.405,-.025,14);
+    const brim=cub(.48,.045,.36,avatarMat.black,0,2.345,-.23);
+    brim.rotation.x=.07;
+    // Estampa escura na camiseta oversized e pena branca longa inconfundível.
+    cub(.20,.30,.015,avatarMat.mesh,0,1.52,-.207);
+    // Corrente do pescoço e detalhe da cruz lateral, sem cabelos visíveis sob o boné.
+    const chainA=cyl(.008,.008,.25,avatarMat.silver,-.084,1.80,-.203,5);
+    chainA.rotation.z=-.43;
+    const chainB=cyl(.008,.008,.25,avatarMat.silver,.084,1.80,-.203,5);
+    chainB.rotation.z=.43;
+    const featherShape=new THREE.Shape();
+    featherShape.moveTo(0,-.22);featherShape.quadraticCurveTo(-.14,0,-.075,.18);
+    featherShape.quadraticCurveTo(.07,.27,.073,.09);
+    featherShape.quadraticCurveTo(.13,-.07,0,-.22);
+    const feather=put(new THREE.ShapeGeometry(featherShape,5),avatarMat.white,0,1.47,-.226);
+    feather.rotation.z=-.12;
+    cub(.012,.40,.012,avatarMat.silver,.004,1.50,-.234);
+    // Alças/argolas e correntes das duas laterais da calça cargo.
+    for(const sign of [-1,1]){
+      for(let j=0;j<3;j++){
+        const link=cyl(.024,.024,.22,avatarMat.silver,sign*(.39+Math.sin(j*.8)*.055),.93-j*.115,0,6);
+        link.rotation.z=sign*.24;
+      }
+      cub(.30,.19,.16,avatarMat.trousers,sign*.31,.69,-.155);
+    }
+    // Cruz invertida preta junto à face esquerda do pescoço.
+    cub(.028,.14,.015,avatarMat.black,.151,2.04,-.085);
+    cub(.094,.023,.016,avatarMat.black,.151,1.995,-.087);
+  }else if(isNeb){
+    // Saia preta plissada; NÃO calça. Meia-calça escura e rasgada sugerida por materiais.
+    cyl(.38,.55,.46,avatarMat.jacket,0,.95,0,12);
+    for(let i=0;i<10;i++){
+      const a=i*Math.PI*2/10;
+      const pleat=cub(.08,.38,.023,avatarMat.black,Math.sin(a)*.43,.89,Math.cos(a)*.43);
+      pleat.rotation.y=a;
+    }
+    // Cabelo longo preto até região lombar, madeixas atrás e nas laterais.
+    put(new THREE.SphereGeometry(.285,12,8),avatarMat.hair,0,2.32,.065);
+    for(let i=0;i<7;i++){
+      const x=(i-3)*.083;
+      cub(.098,1.55,.10,avatarMat.hair,x,1.49,.24 + .02*Math.cos(i));
+    }
+    cub(.12,.83,.12,avatarMat.hair,-.225,1.86,-.12);
+    cub(.115,.90,.12,avatarMat.hair,.225,1.81,-.12);
+    // Uma única mecha vermelha intensa, presa ao cabelo, próxima ao rosto.
+    cub(.077,1.18,.034,avatarMat.streak,-.176,1.80,-.205);
+    // Gargantilha e colar prateado.
+    cyl(.152,.152,.049,avatarMat.black,0,2.027,0,10);
+    cub(.050,.058,.016,avatarMat.silver,0,1.91,-.214);
+    // Câmera real como objeto preso pela alça à frente do torso.
+    const bag=cub(.38,.255,.145,avatarMat.black,.09,1.34,-.27);
+    const lens=cyl(.103,.103,.112,avatarMat.silver,.09,1.36,-.38,12);
+    lens.rotation.x=Math.PI/2;
+    const glass=cyl(.068,.068,.112,mats.clue,.09,1.36,-.444,10);
+    glass.rotation.x=Math.PI/2;
+    const strap=cub(.032,.80,.025,avatarMat.silver,-.16,1.65,-.247);
+    strap.rotation.z=.35;
+    // Bolsa lateral da fotógrafa e punhos escuros para a silhueta canônica.
+    cub(.40,.30,.15,avatarMat.jacket,-.53,1.00,.07);
+    cub(.36,.054,.23,avatarMat.silver,.09,1.55,-.279);
+    for(const arm of arms) cub(.26,.075,.26,avatarMat.black,0,-.69,0,arm);
+  }else{
+    // NPC técnico provisório com faixa cinza na jaqueta.
+    cub(.72,.27,.46,avatarMat.tech,0,1.74,0);
+  }
+  scene.add(outer);
+  outer.userData.animated={arms,legs,body,walk:0};
+  return outer;
+}
+const characters = [
+  { name: 'HellBoy', tag:'hell', model:avatar('hell'), pos:new THREE.Vector3(-.8,0,6.2), turn:Math.PI, speed:3.1, verticalSpeed:0, jumpsUsed:0, land:0, airTime:0, hp:100, attackAnim:0 },
+  { name:'Nebulosa', tag:'neb', model:avatar('neb'), pos:new THREE.Vector3(.95,0,7.3), turn:Math.PI, speed:2.95, verticalSpeed:0, jumpsUsed:0, land:0, airTime:0, hp:100, attackAnim:0 }
+];
+// Efeito de pouso compartilhando geometria; sem partículas ou luzes dinâmicas caras.
+const landingGeo=new THREE.RingGeometry(.30,.38,18);
+for(const c of characters){
+  const material=new THREE.MeshBasicMaterial({color: c.tag==='hell'?'#f4c1da':'#96eafa', transparent:true, opacity:0, depthWrite:false, side:THREE.DoubleSide});
+  const ring=new THREE.Mesh(landingGeo,material);
+  ring.rotation.x=-Math.PI/2;ring.visible=false;scene.add(ring);c.landingRing=ring;
+}
+const technician = avatar('tech'); // personagem técnico temporário, futuramente usar modelo oficial de Drux
+technician.position.set(3.8, 0, -4.8);
+technician.rotation.y = 0.6;
+
+// Letras do Orfeu em textura minúscula: custo baixo no Galaxy A11.
+function neonSign(text,x,y,z,w,h) {
+  const c=document.createElement('canvas'); c.width=512;c.height=128;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,512,128);
+  ctx.font='900 92px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='#e32775';ctx.shadowBlur=20;ctx.fillStyle='#ff83c6';ctx.fillText(text,256,68);
+  const t=new THREE.CanvasTexture(c);
+  const m=new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,side:THREE.DoubleSide});
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);mesh.position.set(x,y,z);scene.add(mesh);
+}
+neonSign('ORFEU',0,4.30,-14.56,7.8,1.95);
+// Caixa de som e luzes indiretas, sem múltiplas sombras dinâmicas no celular.
+for(const sign of [-1,1]){
+  block(1.32,2.28,.86,sign*5.22,1.46,-12.28,mats.cloth,true);
+  for (const y of [.74,1.65]) {
+    const speaker=new THREE.Mesh(new THREE.CylinderGeometry(.29,.29,.035,12),mats.metal);
+    speaker.rotation.x=Math.PI/2;speaker.position.set(sign*5.22,y,-11.81);scene.add(speaker);
+  }
+  block(.12,4.1,.14,sign*6.5,3.1,-11.5,mats.metal);
+}
+for(const z of [-9,-5,0,5,9]){
+   block(.045,.12,2.2,-11.47,3.15,z,mats.red);
+   block(.045,.12,2.2,11.47,3.15,z,mats.neon);
+}
+function ringAt(x,z,color) {
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.56, 0.047, 8, 38),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .88 })
+  );
+  ring.rotation.x = -Math.PI/2;
+  ring.position.set(x, 0.055, z);
+  scene.add(ring);
+  return ring;
+}
+const interactables = [
+  { id: 'tech', name: 'Técnico do Orfeu', pos: new THREE.Vector3(3.8,0,-4.8), ring: ringAt(3.8,-4.8,'#a348c8'), action: 'talk' },
+  { id: 'lens', name: 'Ponto investigável', pos: new THREE.Vector3(-4.1,0,-9.4), ring: ringAt(-4.1,-9.4,'#53c9d5'), action: 'lens' },
+  { id: 'stage', name: 'Palco do Orfeu', pos: new THREE.Vector3(0,0,-10), ring: ringAt(0,-10,'#e33b81'), action: 'stage' },
+  { id: 'train', name: 'Treino opcional de combate', pos: new THREE.Vector3(-3.8,0,4.1), ring: ringAt(-3.8,4.1,'#ffad6c'), action: 'train' },
+  { id: 'exit', name: 'Porta de saída', pos: new THREE.Vector3(0,0,12.9), ring: ringAt(0,12.9,'#77e7bb'), action: 'exit' }
+];
+// Fita dourada de teste escondida em cima do palco: exige salto; não pertence ao roteiro canônico.
+const awardRing=ringAt(3.2,-12.65,'#ffca66');
+awardRing.position.y=.685;
+interactables.push({id:'award',name:'Fita do palco',pos:new THREE.Vector3(3.2,.625,-12.65),ring:awardRing,action:'award',baseY:.685});
+block(.30,.085,.22,3.2,.71,-12.65,mats.metal,true);
+block(.18,.09,.02,3.2,.77,-12.77,mats.neon);
+block(0.7, 0.58, 0.35, -4.1, 0.4, -9.4, mats.metal, true);
+const trainConsole=block(.53,.67,.47,-3.8,.37,4.1,mats.metal);
+block(.42,.06,.34,-3.8,.73,4.1,mats.red);
+// ALVO DE TREINO: apenas mecânica opcional, sem valor canônico para a história.
+const dummyBase = new THREE.Group();
+const dummyMat = makeLitMaterial({color:'#432638',emissive:'#82163e',emissiveIntensity:.30,roughness:.78});
+const dummyCore = new THREE.Mesh(new THREE.CylinderGeometry(.32,.43,1.33,8),dummyMat);
+dummyCore.position.y=.79;dummyBase.add(dummyCore);
+const dummyEye = new THREE.Mesh(new THREE.BoxGeometry(.30,.10,.08),new THREE.MeshBasicMaterial({color:'#ff7aab'}));
+dummyEye.position.set(0,1.29,-.29);dummyBase.add(dummyEye);
+const dummyRing=new THREE.Mesh(new THREE.TorusGeometry(.52,.035,7,22),new THREE.MeshBasicMaterial({color:'#f7559c'}));
+dummyRing.rotation.x=-Math.PI/2;dummyRing.position.y=.05;dummyBase.add(dummyRing);
+dummyBase.visible=false;scene.add(dummyBase);
+const training = {
+  active:false, completed:0, maxHp:5, hp:5, pos:new THREE.Vector3(-3.7,0,-.8),
+  attackCd:0, dodgeCd:0, dodgeTime:0, invuln:0, hitCd:1.3,
+  attackFlash:0, bounce:0, timer:0, dodgeDir:new THREE.Vector3(0,0,-1)
+};
+const clock = new THREE.Clock();
+const cameraTarget = new THREE.Vector3();
+const cameraPos = new THREE.Vector3();
+let lastHudUpdate = -100;
+const temp = new THREE.Vector3();
+let currentNearby = null;
+
+// Solos e plataformas: jogador pode saltar acima do obstáculo, mas não atravessá-lo lateralmente.
+function overBlock(x,z,b,r=0){
+  return x+r>b.minX && x-r<b.maxX && z+r>b.minZ && z-r<b.maxZ;
+}
+function surfaceAt(x,z){
+  let surface=0;
+  for (const b of blockers){
+    if (b.platform && overBlock(x,z,b,.12)) surface=Math.max(surface,b.top);
+  }
+  return surface;
+}
+function canEnter(x,z,actor=null,r=.28){
+  if(x < -11.5+r || x > 11.5-r || z < -14.5+r || z > 14.5-r) return false;
+  for (const b of blockers){
+    if(!overBlock(x,z,b,r)) continue;
+    // Acima de uma plataforma pode caminhar; obstáculos sem topo caminhável bloqueiam.
+    if (!b.platform || !actor || actor.pos.y < b.top-EPS) return false;
+  }
+  return true;
+}
+function moveToward(actor,dx,dz){
+  const nx=actor.pos.x+dx;
+  const nz=actor.pos.z+dz;
+  if(canEnter(nx,actor.pos.z,actor)) actor.pos.x=nx;
+  if(canEnter(actor.pos.x,nz,actor)) actor.pos.z=nz;
+}
+function showToast(message,seconds=2.0){
+  ui.toast.textContent=message;
+  ui.toast.classList.remove('hidden');
+  state.toastTimer=seconds;
+}
+function runningNow(){return state.sprint || state.input.has('ShiftLeft') || state.input.has('ShiftRight');}
+function moveInput(){
+  const ix=(state.input.has('KeyD')?1:0)-(state.input.has('KeyA')?1:0)+state.padX;
+  const iz=(state.input.has('KeyS')?1:0)-(state.input.has('KeyW')?1:0)+state.padY;
+  return {ix,iz};
+}
+function directionFor(actor){
+  const {ix,iz}=moveInput(), length=Math.hypot(ix,iz);
+  if(length>.15){
+    const cos=Math.cos(state.lookYaw),sin=Math.sin(state.lookYaw);
+    return new THREE.Vector3((ix*cos+iz*sin)/length,0,(iz*cos-ix*sin)/length);
+  }
+  return new THREE.Vector3(-Math.sin(actor.turn),0,-Math.cos(actor.turn));
+}
+function dodge(){
+  if(!state.started || state.dialog || training.dodgeTime>0 || training.dodgeCd>0)return;
+  training.dodgeTime=.26;
+  training.dodgeCd=1.12;
+  training.invuln=Math.max(training.invuln,.38);
+  training.dodgeDir.copy(directionFor(characters[state.active]));
+  showToast('ESQUIVA!',.55);
+}
+function startTraining(){
+  training.active=true;training.hp=training.maxHp;training.pos.set(-3.7,0,-.8);
+  training.hitCd=2.0;training.attackCd=0;training.dodgeCd=0;
+  dummyBase.visible=true;ui.trainingHud.classList.remove('hidden');
+  openDialog('SIMULAÇÃO DE COMBATE', 'Treino NÃO CANÔNICO: um alvo 3D simples vai perseguir você. Pressione F para atacar e Q para esquivar. Segure SHIFT para correr. No celular use os botões. Derrote o alvo com cinco golpes.');
+}
+function stopTraining(){
+  training.active=false;dummyBase.visible=false;
+  ui.trainingHud.classList.add('hidden');
+}
+function attack(){
+  if(!state.started || state.dialog || training.attackCd>0)return;
+  training.attackCd=.43;
+  characters[state.active].attackAnim=.30;
+  if(!training.active)return;
+  const active=characters[state.active];
+  const delta=training.pos.clone().sub(active.pos),flat=new THREE.Vector3(delta.x,0,delta.z);
+  const distance=flat.length();
+  const aim=directionFor(active); // aceita alvo na direção de ataque / de movimentação
+  if(distance<2.05 && (distance<.65 || flat.normalize().dot(aim)>.02)){
+    training.hp=Math.max(0,training.hp-1);training.attackFlash=.18;
+    showToast(`ACERTO! Alvo ${training.hp}/${training.maxHp}`,1);
+    if(training.hp===0){
+      training.completed++;stopTraining();
+      showToast('TREINO CONCLUÍDO! +1 vitória',3.4);
+    }
+  }else showToast('Aproxime-se e mire no alvo',.7);
+}
+function updateCombat(dt,t){
+  training.attackCd=Math.max(0,training.attackCd-dt);
+  training.dodgeCd=Math.max(0,training.dodgeCd-dt);
+  training.invuln=Math.max(0,training.invuln-dt);
+  training.attackFlash=Math.max(0,training.attackFlash-dt);
+  if(state.toastTimer>0){state.toastTimer-=dt;if(state.toastTimer<=0)ui.toast.classList.add('hidden');}
+  if(!state.started || state.dialog)return;
+  const active=characters[state.active];
+  active.attackAnim=Math.max(0,active.attackAnim-dt);
+  if(training.dodgeTime>0){
+    training.dodgeTime=Math.max(0,training.dodgeTime-dt);
+    moveToward(active,training.dodgeDir.x*dt*7.5,training.dodgeDir.z*dt*7.5);
+  }
+  if(t-lastHudUpdate>0.22){
+    lastHudUpdate=t;
+    ui.runButton.classList.toggle('on',runningNow());
+    ui.actionStats.textContent=`⇧ SHIFT: ${runningNow()?'CORRENDO':'CORRER'} · VIDA: ${active.hp} · ESQUIVA: ${training.dodgeCd>0?training.dodgeCd.toFixed(1)+'s':'PRONTA'}`;
+  }
+  if(!training.active){ui.actionPanel.classList.add('hidden');return;}
+  const dist=Math.hypot(active.pos.x-training.pos.x,active.pos.z-training.pos.z);
+  // O alvo só se move quando a distância é relevante; sem pathfinding caro.
+  if(dist>1.65 && dist<11){
+    const vx=(active.pos.x-training.pos.x)/dist, vz=(active.pos.z-training.pos.z)/dist;
+    const probe={pos:training.pos};
+    moveToward(probe,vx*dt*1.75,vz*dt*1.75);
+  }
+  training.hitCd-=dt;
+  if(dist<1.72 && training.hitCd<=0){
+    training.hitCd=1.65;
+    if(training.invuln>0)showToast('ESQUIVA PERFEITA!',.9);
+    else{
+      active.hp=Math.max(0,active.hp-12);
+      showToast(`DANO RECEBIDO · VIDA ${active.hp}`,1.1);
+      if(active.hp<=0){stopTraining();active.hp=100;showToast('TREINO ENCERRADO · VIDA RESTAURADA',3);}
+    }
+  }
+  dummyBase.position.copy(training.pos);
+  dummyCore.material.emissiveIntensity=training.attackFlash>0?1.5:.3;
+  dummyBase.position.y=.06+Math.sin(t*3)*.04;
+  dummyBase.rotation.y=t*.4;
+  if(t-lastHudUpdate<.04){
+    ui.trainingHud.textContent=`SIMULAÇÃO 3D · ALVO ${training.hp}/${training.maxHp} · VITÓRIAS ${training.completed}`;
+    ui.actionPanel.textContent='F ATACAR · Q ESQUIVA · ⇧ SHIFT CORRER';
+  }
+  ui.actionPanel.classList.remove('hidden');
+}
+function updateJumpUi(){
+  const remaining=2-characters[state.active].jumpsUsed;
+  ui.jumpStatus.textContent=`SALTOS: ${remaining}/2`;
+  ui.jumpButton.disabled=remaining<=0;
+  ui.jumpButton.textContent=remaining===1?'DUPLO':'PULAR';
+}
+function jump(){
+  if(!state.started || state.dialog)return;
+  const actor=characters[state.active];
+  if(actor.jumpsUsed>=2)return;
+  actor.verticalSpeed=actor.jumpsUsed===0?JUMP_SPEED:JUMP2_SPEED;
+  actor.jumpsUsed++;
+  actor.land=0;
+  actor.airTime=0;
+  updateJumpUi();
+}
+function updateVertical(actor,dt){
+  actor.land=Math.max(0,actor.land-dt*2.7);
+  // Sem pulo, a personagem permanece apoiada na altura da superfície.
+  const ground=surfaceAt(actor.pos.x,actor.pos.z);
+  if(actor.jumpsUsed===0 && actor.verticalSpeed===0 && Math.abs(actor.pos.y-ground)<EPS){
+    actor.pos.y=ground;
+    return;
+  }
+  const previousY=actor.pos.y;
+  actor.verticalSpeed-=GRAVITY*dt;
+  actor.pos.y+=actor.verticalSpeed*dt;
+  actor.airTime+=dt;
+  if(actor.pos.y>3.92){ actor.pos.y=3.92;actor.verticalSpeed=Math.min(0,actor.verticalSpeed); }
+  // Apoio em plataforma somente se a atravessou por CIMA em queda.
+  const landedOnPlatform=ground>0 && actor.verticalSpeed<=0 && previousY>=ground-EPS && actor.pos.y<=ground;
+  const landedOnFloor=actor.pos.y<=0;
+  if(landedOnPlatform || landedOnFloor){
+    actor.pos.y=landedOnPlatform?ground:0;
+    actor.verticalSpeed=0;
+    actor.jumpsUsed=0;
+    actor.airTime=0;
+    actor.land=1;
+    const ring=actor.landingRing;
+    ring.position.set(actor.pos.x,actor.pos.y+.03,actor.pos.z);
+    ring.scale.setScalar(.68);
+    ring.visible=true;
+    if(actor===characters[state.active]) updateJumpUi();
+  }
+}
+function chooseCharacter() {
+  if (!state.started || state.dialog) return;
+  state.active = 1 - state.active;
+  if(state.active!==1 && state.lens){state.lens=false;document.getElementById('lens-button').classList.remove('on');document.getElementById('lens-badge').classList.add('hidden');document.getElementById('camera-frame').classList.add('hidden');}
+  updateCharUi();
+  updateJumpUi();
+  updateMission();
+}
+function updateCharUi() {
+  const c=characters[state.active];
+  ui.char.textContent=`${c.name} · protótipo 3D`;
+  ui.portrait.style.backgroundImage=`url("${PORTRAITS[c.tag]}")`;
+}
+function openDialog(name, line, opts = [{text:'Continuar',next:null}]) {
+  state.dialog = true;
+  ui.dialog.classList.remove('hidden');
+  ui.dialogName.textContent = name;
+  ui.dialogLine.textContent = line;
+  ui.options.replaceChildren();
+  for (const opt of opts) {
+    const btn = document.createElement('button');
+    btn.textContent = opt.text;
+    btn.onclick = () => { if(opt.next) openDialog(name,opt.next,[{text:'Encerrar',next:null}]); else closeDialog(); };
+    ui.options.appendChild(btn);
+  }
+}
+function closeDialog() { state.dialog = false; ui.dialog.classList.add('hidden'); }
+const objectiveTexts = [
+  '01/05 · Investigue o palco iluminado ao fundo do salão.',
+  '02/05 · Procure o técnico do Orfeu perto do balcão.',
+  '03/05 · Troque para Nebulosa, ative a LENTE e examine a interferência azul.',
+  '04/05 · Volte ao técnico e conte o que descobriu.',
+  '05/05 · Encontre a porta de saída e conclua o teste.',
+  'MISSÃO CONCLUÍDA · Você explorou o Orfeu e encontrou a anomalia!'
+];
+function saveGame(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({quest:state.quest,award:state.award})); } catch(_){}
+}
+function loadGame(){
+  try {const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+    if(saved && Number.isInteger(saved.quest)) state.quest=THREE.MathUtils.clamp(saved.quest,0,5);
+    state.award=Boolean(saved && saved.award);
+  } catch(_){}
+  updateMission();
+  ui.award.textContent=state.award?'SEGREDO DO PALCO: 1/1':'SEGREDO DO PALCO: 0/1';
+  awardRing.visible=!state.award;
+}
+function updateMission(){ ui.mission.textContent=objectiveTexts[state.quest]; }
+function advanceQuest(){state.quest=Math.min(5,state.quest+1);updateMission();saveGame();}
+function toggleLens(){
+  if(!state.started || state.dialog)return;
+  if(state.active!==1){openDialog('Equipamento', 'A câmera investigativa pertence à Nebulosa. Troque de personagem para usá-la.');return;}
+  state.lens=!state.lens;
+  document.getElementById('lens-button').classList.toggle('on',state.lens);
+  document.getElementById('lens-badge').classList.toggle('hidden',!state.lens);
+  document.getElementById('camera-frame').classList.toggle('hidden',!state.lens);
+  ui.hint.textContent = state.lens ? 'LENTE ATIVA · procure um sinal azul no palco' : '';
+}
+function activeCharacterOnStage(){const a=characters[state.active];return a.jumpsUsed===0 && a.pos.y>.60 && overBlock(a.pos.x,a.pos.z,blockers[0]);}
+function doInteract() {
+  if (!state.started) return;
+  if (state.dialog) { closeDialog(); return; }
+  if (!currentNearby) return;
+  const obj=currentNearby;
+  if(obj.action==='train'){
+    if(training.active){stopTraining();showToast('Treino encerrado',1.6);}
+    else startTraining();
+    return;
+  }
+  if(obj.action==='stage'){
+    if(state.quest===0){advanceQuest();openDialog('Palco do Orfeu','O palco está vazio. Há marcas recentes no piso e um ruído estranho na fiação. Alguém deve conhecer este sistema.',[
+      {text:'Procurar o técnico',next:null}]);}
+    else openDialog('Palco do Orfeu','A iluminação continua instável. O silêncio é mais inquietante do que o barulho.');
+  }
+  if(obj.action==='talk'){
+    if(state.quest===1){advanceQuest();openDialog('Técnico do Orfeu', state.active===0 ? 'Cara, não fui eu que quebrei a fiação. Tem uma interferência azul perto do equipamento. Chama a Nebulosa e a câmera dela.' : 'A iluminação falha mesmo com os circuitos estáveis. Sua lente consegue identificar algo que eu não consigo medir.',[
+      {text:'Vou investigar.',next:null}, {text:'Você está com medo?',next:'Medo? De uma fiação que age sozinha? Claro que não. ...Um pouco.'}]);}
+    else if(state.quest===3){advanceQuest();openDialog('Técnico do Orfeu',state.active===1 ? 'Você fotografou? Guarda essa prova, Nebe. Não consigo reproduzir essa interferência em circuito nenhum.' : 'A Nebulosa conseguiu registrar? Então guarda essa imagem. Nem toda anomalia é defeito elétrico.',[
+      {text:'Vamos até a saída.',next:null}]);}
+    else openDialog('Técnico do Orfeu','Não inventei nada sobre o passado do Orfeu. Esta conversa é um exercício de jogabilidade, não uma cena oficial da série.');
+  }
+  if(obj.action==='lens'){
+    if(state.quest===2 && state.active===1 && state.lens){
+      advanceQuest();state.lens=false;
+      document.getElementById('lens-button').classList.remove('on');
+      document.getElementById('lens-badge').classList.add('hidden');document.getElementById('camera-frame').classList.add('hidden');
+      openDialog('Nebulosa · Câmera', 'Através da lente, o reflexo azul revela uma marca que não era visível a olho nu. A foto foi registrada como evidência do teste.',[
+        {text:'Voltar ao técnico.',next:null}]);
+    }else if(state.active!==1){openDialog('Anomalia', 'Parece haver algo no equipamento. Nebulosa pode examinar com sua câmera.');}
+    else if(!state.lens){openDialog('Nebulosa', 'Você percebe uma inconsistência no reflexo. Ative a LENTE para registrar a pista.');}
+    else openDialog('Nebulosa', 'Uma distorção luminosa aparece na lente, mas ainda não sabemos seu significado.');
+  }
+  if(obj.action==='award'){
+    if(activeCharacterOnStage()){
+      if(!state.award){
+        state.award=true;saveGame();ui.award.textContent='SEGREDO DO PALCO: 1/1';
+        awardRing.visible=false;
+        openDialog('DESAFIO OPCIONAL CONCLUÍDO','Você alcançou a parte alta do palco com o salto e encontrou uma fita de demonstração. Ela é um colecionável de teste, não um acontecimento oficial da série.');
+      }
+    } else openDialog('Desafio do palco','Use o salto para subir fisicamente ao palco e alcançar a fita dourada.');
+  }
+  if(obj.action==='exit'){
+    if(state.quest===4){advanceQuest();openDialog('ANGELS NIGHT · PRIMEIRO TESTE CONCLUÍDO', 'Você explorou o Orfeu em 3D, trocou entre HellBoy e Nebulosa, conversou, investigou com a câmera e concluiu uma missão. Esta é uma demonstração original das mecânicas, não a adaptação completa do Episódio 1.',[
+      {text:'Continuar explorando',next:null}]);}
+    else if(state.quest===5)openDialog('Saída do Orfeu', 'O teste está concluído. Você pode continuar explorando ou reiniciar a missão pelo menu.');
+    else openDialog('Saída do Orfeu', 'Antes de sair, investigue o que está acontecendo no salão.');
+  }
+}
+function updateLook(dx,dy) {
+  state.lookYaw -= dx * 0.005;
+  state.lookPitch = THREE.MathUtils.clamp(state.lookPitch + dy * 0.003, -0.08, 0.82);
+}
+
+let padPointerId = null;
+let lookPointerId = null;
+let lookLastX = 0;
+let lookLastY = 0;
+const isTouch = matchMedia('(pointer: coarse)').matches;
+if (isTouch) ui.touch.classList.add('enabled');
+function setPad(x,y) {
+  const limit = 48;
+  const length = Math.hypot(x,y);
+  const factor = length > limit ? limit/length : 1;
+  const px = x * factor;
+  const py = y * factor;
+  state.padX = px / limit;
+  state.padY = py / limit;
+  ui.knob.style.transform = `translate(${px}px,${py}px)`;
+}
+ui.pad.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  padPointerId = e.pointerId;
+  ui.pad.setPointerCapture(e.pointerId);
+  const r = ui.pad.getBoundingClientRect();
+  setPad(e.clientX-r.left-r.width/2,e.clientY-r.top-r.height/2);
+});
+ui.pad.addEventListener('pointermove', e => {
+  if(e.pointerId!==padPointerId) return;
+  const r=ui.pad.getBoundingClientRect();
+  setPad(e.clientX-r.left-r.width/2,e.clientY-r.top-r.height/2);
+});
+const clearPad = e => { if(e.pointerId===padPointerId){padPointerId=null;setPad(0,0);} };
+ui.pad.addEventListener('pointerup',clearPad);
+ui.pad.addEventListener('pointercancel',clearPad);
+renderer.domElement.addEventListener('pointerdown',e=>{
+  if(!state.started || state.dialog || lookPointerId!==null || e.target!==renderer.domElement) return;
+  lookPointerId=e.pointerId;
+  lookLastX=e.clientX;
+  lookLastY=e.clientY;
+  renderer.domElement.setPointerCapture(e.pointerId);
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+  if(e.pointerId!==lookPointerId)return;
+  updateLook(e.clientX-lookLastX,e.clientY-lookLastY);
+  lookLastX=e.clientX;
+  lookLastY=e.clientY;
+});
+const clearLook=e=>{if(e.pointerId===lookPointerId)lookPointerId=null;};
+renderer.domElement.addEventListener('pointerup',clearLook);
+renderer.domElement.addEventListener('pointercancel',clearLook);
+window.addEventListener('keydown',e=>{
+  if(['Tab','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+  if(e.repeat && ['Tab','KeyE','Space','KeyQ','KeyF'].includes(e.code))return;
+  state.input.add(e.code);
+  if(e.code==='Tab')chooseCharacter();
+  if(e.code==='KeyE')doInteract();
+  if(e.code==='KeyC')toggleLens();
+  if(e.code==='Space')jump();
+  if(e.code==='KeyQ' || e.code==='AltLeft')dodge();
+  if(e.code==='KeyF')attack();
+  if(e.code==='Escape' && state.dialog)closeDialog();
+});
+window.addEventListener('keyup',e=>state.input.delete(e.code));
+window.addEventListener('blur',()=>{state.input.clear();state.sprint=false;setPad(0,0);});
+document.getElementById('switch-button').addEventListener('click',chooseCharacter);
+document.getElementById('interact-button').addEventListener('click',doInteract);
+document.getElementById('lens-button').addEventListener('click',toggleLens);
+ui.jumpButton.addEventListener('pointerdown', e => { e.preventDefault(); jump(); });
+document.getElementById('restart-button').addEventListener('click',()=>{stopTraining();for(const actor of characters) actor.hp=100;training.dodgeCd=0;training.dodgeTime=0;state.quest=0;state.award=false;ui.award.textContent='SEGREDO DO PALCO: 0/1';awardRing.visible=true;for(const actor of characters){actor.pos.y=0;actor.jumpsUsed=0;actor.verticalSpeed=0;actor.land=0;actor.airTime=0;actor.landingRing.visible=false;}updateJumpUi();saveGame();updateMission();state.started=true;ui.start.classList.add('hidden');clock.start();});
+document.getElementById('run-button').addEventListener('pointerdown',e=>{e.preventDefault();state.sprint=true;});
+document.getElementById('dodge-button').addEventListener('pointerdown',e=>{e.preventDefault();dodge();});
+document.getElementById('attack-button').addEventListener('pointerdown',e=>{e.preventDefault();attack();});
+for(const evt of ['pointerup','pointercancel','pointerleave']) document.getElementById('run-button').addEventListener(evt,()=>state.sprint=false);
+document.getElementById('start-button').addEventListener('click',()=>{
+  state.started=true;
+  ui.start.classList.add('hidden');
+  clock.start();
+  updateCharUi();
+  updateJumpUi();
+  updateMission();
+});
+loadGame();
+updateJumpUi();
+updateCharUi();
+
+function tick() {
+  requestAnimationFrame(tick);
+  const frameNow=performance.now();
+  const renderElapsed=Math.max(0,frameNow-lastDraw); lastDraw=frameNow;
+  // Ignora longas pausas ao alternar de aplicativo/aba para não reduzir a qualidade injustamente.
+  if(renderElapsed>220){fpsAccum=0;fpsFrames=0;}
+  else{fpsAccum+=renderElapsed;fpsFrames++;}
+  if(fpsAccum>=1500){
+    const fps=Math.round(fpsFrames*1000/fpsAccum);
+    ui.fps.textContent='FPS: '+fps;
+    // Apenas AUTO ajusta resolução; ECO/NORMAL/DETALHES não mudam sozinhos.
+    if(qualityIndex===0 && lowEnd && !document.hidden){
+      slowWindows=fps<28 ? slowWindows+1 : 0;
+      if(slowWindows>=2 && currentRenderRatio>.55){
+        currentRenderRatio=Math.max(.54,Math.round((currentRenderRatio-.07)*100)/100);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,currentRenderRatio));
+        renderer.setSize(window.innerWidth,window.innerHeight,false);
+        updateQualityLabel();
+        slowWindows=0;
+      }
+    }
+    fpsAccum=0;fpsFrames=0;
+  }
+  const dt = Math.min(clock.getDelta(),0.045);
+  const t = clock.elapsedTime;
+  redLight.intensity = 12 + Math.sin(t * 2.2) * 3;
+  updateCombat(dt,t);
+  for(const o of interactables) {
+    o.ring.position.y = (o.baseY??.08)+Math.sin(t*2.3)*0.035;
+    o.ring.rotation.z += dt*0.33;
+    if(o.id==='lens')o.ring.visible=state.lens && state.active===1;
+  }
+  if (state.started) {
+    for (const actor of characters) updateVertical(actor, dt);
+    const active = characters[state.active];
+    const follow = characters[1-state.active];
+    let isMoving=false;
+    if(!state.dialog) {
+      let {ix,iz} = moveInput();
+      const magnitude = Math.hypot(ix,iz);
+      if(magnitude>0.08) {
+        isMoving=true;
+        ix/=Math.max(1,magnitude); iz/=Math.max(1,magnitude);
+        const cos=Math.cos(state.lookYaw),sin=Math.sin(state.lookYaw);
+        const speed=runningNow()?5.10:active.speed;
+        const dx=(ix*cos+iz*sin)*speed*dt;
+        const dz=(iz*cos-ix*sin)*speed*dt;
+        moveToward(active,dx,dz);
+        active.turn=Math.atan2(-dx,-dz);
+      }
+      const d=follow.pos.distanceTo(active.pos);
+      if(d>2.1 && d<16) {
+        temp.copy(active.pos).sub(follow.pos).normalize();
+        moveToward(follow,temp.x*dt*2.1,temp.z*dt*2.1);
+        follow.turn=Math.atan2(-temp.x,-temp.z);
+      }
+    }
+    // Poeira luminosa discreta de pouso; apenas dois anéis procedurais reutilizados.
+    for (const c of characters){
+      const ring=c.landingRing;
+      if(!ring.visible)continue;
+      ring.material.opacity=Math.max(0,c.land*.63);
+      ring.scale.setScalar(.7+(1-c.land)*1.65);
+      if(c.land<=0)ring.visible=false;
+    }
+    const airtimeActive = active.jumpsUsed>0 || active.verticalSpeed<-0.05;
+    ui.airState.classList.toggle('hidden',!airtimeActive);
+    if(airtimeActive) ui.airState.textContent=active.verticalSpeed>0.05?'↑ SUBINDO': '↓ CAINDO';
+    // Movimentos leves de caminhada, pulo e pouso; sem esqueletos externos pesados.
+    for(const c of characters){
+      const parts=c.model.userData.animated;
+      const walking=(c===active ? isMoving : c.pos.distanceTo(active.pos)>2.2);
+      const phase=clock.elapsedTime*(runningNow() && c===active?12.4:8);
+      const airborne=c.pos.y>0.015;
+      if(parts){
+        for(let n=0;n<2;n++) {
+          const rising=c.verticalSpeed>0.25;
+          const swing=airborne ? (rising ? (n===0?.38:-.32) : (n===0?-.25:.34)) : (walking?Math.sin(phase+n*Math.PI)*.38:0);
+          parts.legs[n].rotation.x += (swing-parts.legs[n].rotation.x)*Math.min(1,dt*13);
+          const armTarget=airborne ? (rising?-.53:.22) : -swing*.55;
+          parts.arms[n].rotation.x += ((c.attackAnim>0 && n===0?-1.15:armTarget)-parts.arms[n].rotation.x)*Math.min(1,dt*12);
+        }
+        const crouch=c.land*.12;
+        const breathe=walking?.018*Math.sin(phase*2):.006*Math.sin(clock.elapsedTime*1.5);
+        parts.body.position.y=airborne?-.016 : breathe-crouch;
+        parts.body.rotation.x=training.dodgeTime>0 && c===active?-.23:(airborne ? THREE.MathUtils.clamp(c.verticalSpeed*.025,-.14,.16) : -.09*c.land);
+      }
+      c.model.position.copy(c.pos);
+      c.model.rotation.y=c.turn;
+    }
+    // Follow camera with shallow orbit and basic room bounds.
+    cameraTarget.set(active.pos.x,active.pos.y+1.45,active.pos.z);
+    const radial=4.25*Math.cos(state.lookPitch);
+    cameraPos.set(cameraTarget.x+Math.sin(state.lookYaw)*radial,
+      cameraTarget.y+2.3+3.1*Math.sin(state.lookPitch),
+      cameraTarget.z+Math.cos(state.lookYaw)*radial);
+    cameraPos.x=THREE.MathUtils.clamp(cameraPos.x,-11.1,11.1);
+    cameraPos.z=THREE.MathUtils.clamp(cameraPos.z,-14.1,14.1);
+    cameraPos.y=Math.min(cameraPos.y,6.10);
+    camera.position.lerp(cameraPos,Math.min(1,dt*11));
+    camera.lookAt(cameraTarget);
+    currentNearby=null;
+    let nearest=2.25;
+    for(const obj of interactables){
+      if(obj.id==='award' && state.award) continue;
+      const dist=active.pos.distanceTo(obj.pos);
+      if(dist<nearest){currentNearby=obj;nearest=dist;}
+    }
+    ui.hint.textContent=currentNearby ? `${currentNearby.name} · Interagir` : ''; 
+    ui.hint.classList.toggle('hidden',!currentNearby||state.dialog);
+  } else {
+    camera.position.set(0.8,4.8,12);
+    camera.lookAt(0,1,-5);
+    for(const c of characters){c.model.position.copy(c.pos);c.model.rotation.y=c.turn;}
+  }
+  renderer.render(scene,camera);
+}
+window.addEventListener('resize',()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+tick();
+
+</script>
+  </body>
+</html>
