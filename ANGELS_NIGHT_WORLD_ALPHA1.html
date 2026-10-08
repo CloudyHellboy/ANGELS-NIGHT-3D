@@ -1,0 +1,217 @@
+<!doctype html><html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#080711">
+<title>ANGELS NIGHT WORLD — Alpha 1</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:dark;color:#f7f2fb;background:#080711}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;touch-action:none;user-select:none}button,input,select{font:inherit}button{cursor:pointer;border:1px solid #9573a7;border-radius:11px;color:#fff;background:#31213a;padding:10px 12px;font-size:12px;font-weight:750}button.primary{background:#a92d66;border-color:#ef6ca3}button:active{filter:brightness(1.2)}input,select{background:#171521;color:#fff;border:1px solid #6e587c;border-radius:9px;padding:9px;min-width:0}label{font-size:11px;color:#c7bad4}#canvas{position:fixed;inset:0}#canvas canvas{display:block;width:100%;height:100%;touch-action:none}#hud{position:fixed;inset:10px 12px auto 12px;display:flex;justify-content:space-between;gap:9px;pointer-events:none;z-index:4}.glass{background:#0b0a16e8;border:1px solid #594868;border-radius:13px;box-shadow:0 10px 30px #0007;padding:10px;pointer-events:auto}.brand{font-weight:950;letter-spacing:.08em;font-size:15px}.brand span{color:#f45f9a}.muted{font-size:10px;color:#c2b7cc}.stack{display:grid;gap:5px}#topR{text-align:right;min-width:165px}#title{font-size:12px;font-weight:850}#mission{font-size:11px;color:#ebd7e9;margin-top:4px;max-width:290px}#onlineStatus{font-size:11px;color:#89eccd;font-weight:800}#notice{position:fixed;top:100px;left:50%;transform:translateX(-50%);max-width:min(560px,92vw);background:#111323ee;border:1px solid #3d9cac88;border-radius:14px;font-size:12px;color:#e3f9fd;padding:9px 12px;text-align:center;z-index:4;pointer-events:none}#bottomBar{position:fixed;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;pointer-events:none;z-index:4}#bottomBar>*{pointer-events:auto}#chat{width:min(390px,90vw);max-height:240px;display:none}#chat.show{display:block}#chatLog{height:112px;overflow:auto;font-size:12px;line-height:1.5;overflow-wrap:anywhere}#chatLog .sys{color:#c4b7d2}#chatLog .say{color:#fff}#chatInputRow{display:flex;gap:6px;margin-top:8px}#chatInput{flex:1;width:100%;font-size:12px}#chatSend{padding:9px 12px}#buttons{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}#buttons button{min-width:70px}#touch{display:none;position:fixed;inset:0;pointer-events:none;z-index:5}#touch.on{display:block}#pad{pointer-events:auto;position:absolute;left:16px;bottom:15px;width:115px;height:115px;border-radius:50%;border:2px solid #b5a3c966;background:#4c3c5a80;touch-action:none}#knob{position:absolute;left:36px;top:36px;width:40px;height:40px;background:#e09bbfd9;border:1px solid #fff8;border-radius:50%}#touchBtns{position:absolute;right:10px;bottom:12px;display:grid;grid-template-columns:repeat(3,auto);gap:7px;pointer-events:auto}#touchBtns button{min-width:66px;padding:11px 9px;border-radius:13px;background:#472c50dc;font-size:10px}#menu{position:fixed;inset:0;background:#080613ed;display:grid;place-items:center;z-index:9;padding:12px;overflow:auto}#menu.hidden{display:none}.menuCard{width:min(720px,96vw);max-height:min(95vh,880px);overflow:auto;border:1px solid #80618f;border-radius:20px;padding:19px;background:linear-gradient(145deg,#21162a,#0c0d19);box-shadow:0 20px 55px #000a}.menuCard h1{margin:0;font-size:25px;letter-spacing:.075em}.menuCard h1 span{color:#f95c9c}.menuCard p{color:#d8cbdf;font-size:12px;line-height:1.5}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.tabs button.selected{background:#842a57;border-color:#fa73a9}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.formgrid .field{display:grid;gap:4px}.span2{grid-column:span 2}.formhint{font-size:11px;color:#a5ccff}.actions{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}.actions button{padding:13px 17px}.warn{background:#3c2c19;color:#ffe1b2;padding:8px 10px;border-radius:10px;font-size:11px;margin-top:9px}#err{position:fixed;z-index:20;top:10px;left:10px;right:10px;background:#6b2434;color:white;display:none;padding:12px;border-radius:12px}#err.show{display:block}#interact{position:fixed;left:50%;bottom:104px;transform:translateX(-50%);z-index:5;background:#19172dee;border:1px solid #ea6da0aa;padding:8px 13px;border-radius:15px;font-size:12px;text-align:center;pointer-events:none}#interact.hide{display:none}#dialog{position:fixed;left:50%;bottom:10%;transform:translateX(-50%);z-index:8;width:min(560px,92vw);display:none;background:#110e21f6;border:1px solid #d65e9a;border-radius:16px;padding:17px;box-shadow:0 15px 45px #000b}#dialog.show{display:block}#speaker{color:#ffa5c4;font-weight:900;font-size:12px}#dialog p{font-size:13px;line-height:1.5;margin:10px 0}.dialogActions{display:flex;justify-content:end}#fps{font-size:10px;color:#e6dbe8}.hidden{display:none!important}
+@media(max-width:700px){#hud{inset:7px 7px auto 7px}.brand{font-size:12px}#title{font-size:11px}#mission{font-size:10px;max-width:180px}#notice{top:90px;font-size:10px}#bottomBar{left:5px;right:5px;bottom:5px}#buttons{gap:4px}#buttons button{min-width:52px;font-size:10px;padding:8px}#chat{width:min(90vw,330px)}#chatLog{height:76px}.menuCard{padding:12px}.menuCard h1{font-size:20px}#dialog{bottom:28%;padding:12px}}
+@media(max-height:530px){#notice{display:none}#touchBtns{bottom:5px}#pad{bottom:5px}#topR{min-width:120px}#topR,#hud .glass{padding:7px}#dialog{bottom:18%}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.175.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.175.0/examples/jsm/"}}</script>
+</head><body>
+<div id="canvas"></div><div id="err"></div>
+<header id="hud"><div class="glass stack"><div class="brand">ANGELS <span>NIGHT</span> WORLD <small>ALPHA 1</small></div><div id="title">ORFEU • HUB</div><div id="mission">Escolha um modo para começar.</div></div><div id="topR" class="glass stack"><div id="onlineStatus">MODO LOCAL</div><div id="players">Jogadores reais: 0</div><div id="fps">FPS: --</div></div></header>
+<div id="notice">Alpha de testes. Sem servidor conectado, não aparecem jogadores reais.</div><div id="interact" class="hide"></div>
+<div id="dialog"><div id="speaker"></div><p id="dialogText"></p><div class="dialogActions"><button id="dialogClose">Continuar</button></div></div>
+<footer id="bottomBar"><div id="chat" class="glass"><div style="font-size:11px;font-weight:850;color:#f5b0cc">CHAT DO ORFEU</div><div id="chatLog"></div><div id="chatInputRow"><input id="chatInput" maxlength="140" placeholder="Mensagem (até 140 caracteres)"><button id="chatSend">Enviar</button></div></div><div id="buttons"><button id="btnMenu">MENU</button><button id="btnChat">CHAT</button><button id="btnInter">INTERAGIR</button><button id="btnLens">LENTE</button><button id="btnWave">ACENAR</button><button id="btnSwitch">TROCAR</button></div></footer>
+<div id="touch"><div id="pad"><div id="knob"></div></div><div id="touchBtns"><button id="btnRun">CORRER</button><button id="btnJump">PULAR</button><button id="btnTouchInter">INTERAGIR</button><button id="btnTouchLens">LENTE</button><button id="btnTouchChat">CHAT</button><button id="btnTouchMenu">MENU</button></div></div>
+<div id="menu"><div class="menuCard"><h1>ANGELS <span>NIGHT</span> WORLD</h1><p>Um universo social 3D e um modo história inspirado no anime. Esta Alpha é uma prova jogável para o Samsung Galaxy A11, não o mundo completo.</p><div class="tabs"><button id="tabSocial" class="selected">🌐 MUNDO SOCIAL</button><button id="tabStory">🎬 MODO HISTÓRIA</button></div>
+<div id="socialFields" class="formgrid">
+<div class="field"><label for="nickname">Nome do avatar</label><input id="nickname" maxlength="18" value="Visitante" autocomplete="off"></div>
+<div class="field"><label for="room">Sala</label><select id="room"><option value="ORFEU-01">Orfeu 01</option><option value="ORFEU-02">Orfeu 02</option></select></div>
+<div class="field"><label for="hair">Cabelo</label><select id="hair"><option value="short">Curto</option><option value="long">Longo</option><option value="bob">Médio</option></select></div>
+<div class="field"><label for="hairColor">Cor do cabelo</label><select id="hairColor"><option value="black">Preto</option><option value="red">Preto + vermelho</option><option value="violet">Roxo</option><option value="silver">Prata</option></select></div>
+<div class="field"><label for="outfit">Roupas</label><select id="outfit"><option value="black">Preto underground</option><option value="wine">Vinho gótico</option><option value="violet">Roxo noturno</option></select></div>
+<div class="field"><label for="serverUrl">Servidor (WSS) • opcional</label><input id="serverUrl" type="url" placeholder="wss://seu-servidor.onrender.com"></div>
+<div class="field span2"><label for="accessCode">Código de acesso de testes (se houver)</label><input id="accessCode" type="password" placeholder="Opcional"></div>
+<div class="span2 formhint">Sem URL do servidor, você entra no Orfeu sozinho em modo local. Para ver amigos reais, o servidor incluído no pacote precisa estar publicado.</div>
+</div>
+<div id="storyFields" class="hidden"><p><b>História Alpha: Ecos no Orfeu.</b> Controlar HellBoy ou Nebulosa, falar com Drux, investigar uma interferência pela câmera e descobrir o primeiro indício da Zona Obscura. Essa pequena missão é um protótipo narrativo, não uma reescrita dos episódios oficiais.</p></div>
+<div class="warn">Acesso social experimental: avatares visitantes, sem contas, compras, armazenamento permanente ou moderação profissional. Não publique salas abertas ao público nesta fase.</div>
+<div class="actions"><button id="start" class="primary">ENTRAR NO ORFEU</button><button id="help">COMO JOGAR</button></div><p id="helpText" class="hidden">PC: WASD andar • Shift correr • Espaço salto duplo • Tab alternar protagonista • E interagir • C lente • Enter chat. Android: joystick e botões na tela; arraste o cenário para girar a câmera.</p>
+</div></div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const $ = id => document.getElementById(id);
+const ui = {menu:$('menu'), social:$('socialFields'), story:$('storyFields'), status:$('onlineStatus'), players:$('players'), notice:$('notice'), mission:$('mission'), title:$('title'), interact:$('interact'), dialogue:$('dialog'), speaker:$('speaker'), dialogText:$('dialogText'), chat:$('chat'), chatLog:$('chatLog'), chatInput:$('chatInput'), fps:$('fps'), error:$('err')};
+const state = {running:false, mode:'social', online:false, dialog:false, localPlayer:null, ws:null, id:null, actor:0, quest:0, lens:false, runningButton:false, input:new Set(), padX:0,padY:0, lookYaw:0, lookPitch:.26, lookId:null, lookX:0, lookY:0, stage:'ORFEU', graphics:'ECO', lastStateSend:0, characterModels:[], remote:new Map(), users:new Map(), nearby:null, fps:0, frames:0, acc:0, chatting:false, reconnect:false};
+const HAS_TOUCH=matchMedia('(pointer:coarse)').matches;
+if(HAS_TOUCH)$('touch').classList.add('on');
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const cleanLabel=s=>String(s||'').replace(/[<>\\\x00-\x1F]/g,'').trim().slice(0,20)||'Visitante';
+const slugColor={black:'#12111c',red:'#9d163a',violet:'#754cbd',silver:'#bdc4d8'};
+const clothColor={black:'#12111b',wine:'#40202e',violet:'#302347'};
+const storeKey='angels-night-world-alpha1-guest';
+try{const settings=JSON.parse(localStorage.getItem(storeKey)||'null'); if(settings){for(const k of ['nickname','room','hair','hairColor','outfit','serverUrl']){if(typeof settings[k]==='string' && $(k)) $(k).value=settings[k];}}}catch{}
+function persistPrefs(){try{localStorage.setItem(storeKey,JSON.stringify(Object.fromEntries(['nickname','room','hair','hairColor','outfit','serverUrl'].map(k=>[k,$(k).value]))));}catch{}}
+function showNotice(s){ui.notice.textContent=s;}
+function error(s){ui.error.textContent=s;ui.error.classList.add('show');}
+function chatLine(who,text,type='say') {const line=document.createElement('div');line.className=type;const label=document.createElement('strong');label.textContent=type==='sys'?'Sistema: ':who+': ';line.append(label,document.createTextNode(text));ui.chatLog.append(line);while(ui.chatLog.childNodes.length>40)ui.chatLog.firstChild.remove();ui.chatLog.scrollTop=ui.chatLog.scrollHeight;}
+function say(name,text,onClose){state.dialog=true;ui.dialogue.classList.add('show');ui.speaker.textContent=name;ui.dialogText.textContent=text;state.dialogCallback=onClose||null;}
+function closeSay(){state.dialog=false;ui.dialogue.classList.remove('show');const cb=state.dialogCallback;state.dialogCallback=null;if(cb)cb();}
+$('dialogClose').onclick=closeSay;
+$('tabSocial').onclick=()=>switchMode('social'); $('tabStory').onclick=()=>switchMode('story');
+function switchMode(m){state.mode=m;$('tabSocial').classList.toggle('selected',m==='social');$('tabStory').classList.toggle('selected',m==='story');ui.social.classList.toggle('hidden',m!=='social');ui.story.classList.toggle('hidden',m!=='story');}
+$('help').onclick=()=>$('helpText').classList.toggle('hidden');
+const scn=new THREE.Scene();scn.background=new THREE.Color('#080711');scn.fog=new THREE.FogExp2('#080711',.031);
+const cam=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.08,95);
+const renderer=new THREE.WebGLRenderer({antialias:!HAS_TOUCH,powerPreference:'high-performance',precision:'mediump'});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,HAS_TOUCH?.8:1.1));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;$('canvas').appendChild(renderer.domElement);
+scn.add(new THREE.HemisphereLight('#c4c5e6','#140a1b',1.7));
+const dlight=new THREE.DirectionalLight('#ffffff',2.4);dlight.position.set(5,9,6);scn.add(dlight);
+const ptlight=new THREE.PointLight('#db377c',15,18);ptlight.position.set(-5,4,-7);scn.add(ptlight);
+const basic=(color,emissive)=>new THREE.MeshToonMaterial({color,emissive:emissive||'#000000',emissiveIntensity:emissive?0.9:0});
+const mats={floor:basic('#19151f'),wall:basic('#171321'),raised:basic('#27202c'),steel:basic('#57515f'),pink:basic('#fc559c','#6c102d'),blue:basic('#60c4fc','#0b4664'),dark:basic('#0c0c13'),white:basic('#dfdfea'),skin:basic('#bc8469'),pale:basic('#edd5cf'),red:basic('#a91c43'),silver:new THREE.MeshStandardMaterial({color:'#aab4c2',roughness:.35,metalness:.7})};
+function shape(parent,geo,material,x=0,y=0,z=0,rx=0,ry=0,rz=0){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);parent.add(m);return m;}
+function box(parent,w,h,d,x,y,z,mat){return shape(parent,new THREE.BoxGeometry(w,h,d),mat,x,y,z);}
+function round(parent,x,y,z,sx,sy,sz,mat){const o=shape(parent,new THREE.SphereGeometry(1,12,10),mat,x,y,z);o.scale.set(sx,sy,sz);return o;}
+function limb(parent,from,to,r0,r1,mat){const a=new THREE.Vector3(...from),b=new THREE.Vector3(...to),d=b.clone().sub(a);const m=shape(parent,new THREE.CylinderGeometry(r0,r1,d.length(),10),mat,...a.clone().addScaledVector(d,.5).toArray());m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());return m;}
+function board(parent,x,y,z,w,h,d,col){return box(parent,w,h,d,x,y,z,col);}
+// Quiet, low draw-call Orfeu hub. Static decor only; no false claim of canonical recreation.
+const room=new THREE.Group();scn.add(room);
+box(room,24,.2,30,0,-.13,0,mats.floor);box(room,24,7,.4,0,3.5,-15,mats.wall);box(room,24,7,.4,0,3.5,15,mats.wall);box(room,.4,7,30,-12,3.5,0,mats.wall);box(room,.4,7,30,12,3.5,0,mats.wall);box(room,24,.3,30,0,7,0,mats.wall);
+box(room,14,.8,3.0,0,.33,-12.8,mats.raised);box(room,10,.1,.12,0,5.65,-14.7,mats.pink);
+box(room,4.9,1.2,1.8,7,.63,-3,mats.raised);box(room,2,3,.2,0,1.5,14.69,mats.steel);box(room,1.7,.16,.24,0,3.17,14.53,mats.pink);
+for(const x of [-9,-5,-1,3]){box(room,1.25,.15,1.25,x,.85,3,mats.raised);box(room,.16,.85,.16,x,.45,3,mats.steel);}
+for(const x of [-9.5,9.5]){box(room,.9,3,.5,x,1.5,-12.7,mats.dark);box(room,.84,.13,.52,x,2.6,-13,mats.pink);}
+for(const z of [-10,0,10]){box(room,.13,.13,22,0,6.65,z,mats.steel);}
+for(const x of [-9.8,9.8]){for(const z of [-7,6])box(room,.18,2.5,.18,x,1.3,z,mats.steel);}
+const titleCanvas=document.createElement('canvas');titleCanvas.width=768;titleCanvas.height=128;let tctx=titleCanvas.getContext('2d');tctx.fillStyle='#100c1d';tctx.fillRect(0,0,768,128);tctx.textAlign='center';tctx.font='bold 74px Arial';tctx.fillStyle='#fc6ca8';tctx.fillText('ORFEU',384,90);const titleMap=new THREE.CanvasTexture(titleCanvas);titleMap.colorSpace=THREE.SRGBColorSpace;const titleMesh=shape(room,new THREE.PlaneGeometry(6.8,1.15),new THREE.MeshBasicMaterial({map:titleMap,transparent:true}),0,4.55,-14.72);
+function ring(x,z,color){const m=shape(scn,new THREE.TorusGeometry(.65,.06,6,32),basic(color),x,.055,z,-Math.PI/2);return m;}
+const checkpoints=[{id:'drux',x:6.5,z:-4.2,r:ring(6.5,-4.2,'#c788fe')},{id:'anomalia',x:-4.4,z:-10,r:ring(-4.4,-10,'#6bddfb')},{id:'exit',x:0,z:13,r:ring(0,13,'#6deab2')}];
+
+// Anime-inspired prototype meshes; GLB production assets load via the manifest below when supplied.
+const tint=(c)=>basic(c);
+const makeAvatar=(kind='guest',appearance={})=>{
+  const g=new THREE.Group(),skeleton=new THREE.Group();g.add(skeleton);
+  const hell=kind==='hell',neb=kind==='neb',female=neb||appearance.hair==='long';
+  const skin=hell?mats.skin:neb?mats.pale:basic('#c8a18a');
+  const cloth=hell||neb?mats.dark:tint(clothColor[appearance.outfit]||'#171421');
+  const hairColor=appearance.hairColor==='silver'?'#9da5b7':appearance.hairColor==='violet'?'#604383':'#111018';
+  const hair=tint(hairColor);
+  const upperL=new THREE.Group(),upperR=new THREE.Group(),legL=new THREE.Group(),legR=new THREE.Group();
+  skeleton.add(upperL,upperR,legL,legR);
+  upperL.position.set(-.51,2.05,0);upperR.position.set(.51,2.05,0);legL.position.set(-.2,.98,0);legR.position.set(.2,.98,0);
+  limb(legL,[0,0,0],[0,-.78,0],.19,.13,neb?tint('#38303c'):mats.dark);limb(legR,[0,0,0],[0,-.78,0],.19,.13,neb?tint('#38303c'):mats.dark);
+  round(legL,0,-.77,-.09,.22,.12,.37,mats.dark);round(legR,0,-.77,-.09,.22,.12,.37,mats.dark);
+  limb(upperL,[0,0,0],[-.15,-.72,0],.22,.13,cloth);limb(upperR,[0,0,0],[.15,-.72,0],.22,.13,cloth);
+  round(upperL,-.15,-.81,0,.12,.18,.13,skin);round(upperR,.15,-.81,0,.12,.18,.13,skin);
+  round(skeleton,0,1.72,0,.61,.62,.34,cloth);
+  if(neb){const skirt=shape(skeleton,new THREE.CylinderGeometry(.5,.68,.44,12),mats.dark,0,1.15,0);round(skeleton,0,2.38,.08,.31,.42,.28,skin);}else{round(skeleton,0,2.38,.08,.30,.40,.29,skin);}
+  // Stylized anime eyes and brows on front -Z.
+  const eye=tint('#211c27'),highlight=basic('#eeeeff');
+  for(const x of [-.13,.13]){round(skeleton,x,2.42,-.204,.083,.046,.02,eye);round(skeleton,x-.023,2.435,-.226,.016,.015,.008,highlight);}
+  // Hair is shoulder-level for guests unless overridden; HellBoy hair never exits cap.
+  if(!hell){
+    round(skeleton,0,2.76,.025,.33,.19,.31,hair);
+    const long=neb||appearance.hair==='long',bob=appearance.hair==='bob';
+    if(long||bob){const len=long?.90:.48;for(const x of [-.28,.28])round(skeleton,x,2.2+(long?-.06:0),.08,.12,len/2+.15,.17,hair);round(skeleton,0,2.31,.24,.30,long?.57:.30,.09,hair);}
+    if(neb||appearance.hairColor==='red')round(skeleton,-.21,2.38,-.16,.08,.56,.10,mats.red);
+  }else{
+    round(skeleton,0,2.77,0,.37,.15,.34,mats.dark);round(skeleton,0,2.68,-.29,.36,.065,.25,mats.dark);
+    // never generate medium or long hair on HellBoy.
+  }
+  if(hell){
+    // Pendant/necklace and prominent white feather.
+    limb(skeleton,[0,2.01,-.33],[0,1.80,-.40],.015,.015,mats.silver);round(skeleton,0,1.69,-.41,.06,.17,.015,mats.white);
+    for(const x of [-.49,-.43]){round(skeleton,x,1.07,-.1,.03,.20,.03,mats.silver);} // cargo chain hint
+    // inverted cross left neck
+    const mark=box(skeleton,.025,.14,.018,-.265,2.3,-.125,mats.dark);box(skeleton,.11,.024,.02,-.265,2.35,-.128,mats.dark);
+  }
+  if(neb){
+    const bodyCam=box(skeleton,.32,.22,.14,.42,1.45,-.26,mats.steel);shape(skeleton,new THREE.CylinderGeometry(.08,.08,.065,12),mats.dark,.42,1.45,-.36,Math.PI/2);
+    round(skeleton,.55,1.25,0,.13,.17,.19,mats.dark); // bag
+  }
+  g.userData.anim={upperL,upperR,legL,legR,step:0};
+  return g;
+};
+
+const GLB_FILES={hell:'assets/hellboy.glb',neb:'assets/nebulosa.glb'}; // Usa malhas provisórias automaticamente se GLBs não estiverem disponíveis.
+const modelLoader=new GLTFLoader();
+async function replaceWithGLB(actor,type){
+  const src=GLB_FILES[type]; if(!src)return;
+  try {const gltf=await modelLoader.loadAsync(src);const obj=gltf.scene;obj.traverse(m=>{if(m.isMesh){m.frustumCulled=true;if(m.material) m.material.side=THREE.FrontSide;}});
+    const box3=new THREE.Box3().setFromObject(obj),size=box3.getSize(new THREE.Vector3());if(size.y<.1)return;
+    obj.scale.setScalar(2.6/size.y);
+    const min=new THREE.Box3().setFromObject(obj).min;obj.position.y-=min.y;
+    actor.view.remove(actor.mesh);actor.mesh=obj;actor.view.add(obj);actor.hasGLB=true;
+    appendReport('Modelo externo GLB carregado: '+type);
+  }catch{ /* No definitive GLB bundled in this Alpha; fallback remains visible and named honestly. */ }
+}
+const actors=[];
+const makeActor=(kind,appearance,x,z,name,remote=false)=>{
+  const root=new THREE.Group();const model=makeAvatar(kind,appearance);root.add(model);root.position.set(x,0,z);scn.add(root);
+  const a={kind,name,appearance,view:root,mesh:model,x,z,y:0,vY:0,jumps:0,yaw:Math.PI,animTime:0,remote,hasGLB:false};
+  if(name){const cnv=document.createElement('canvas');cnv.width=256;cnv.height=72;const ctx=cnv.getContext('2d');ctx.fillStyle='#10101ccd';ctx.fillRect(0,0,256,72);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 28px Arial';ctx.fillText(cleanLabel(name),128,46);const texture=new THREE.CanvasTexture(cnv);const badge=shape(root,new THREE.PlaneGeometry(1.8,.51),new THREE.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false}),0,3.55,0);badge.userData.billboard=true;a.badge=badge;}
+  actors.push(a);return a;
+};
+const storyActors=[makeActor('hell',{},-1,5.0,null),makeActor('neb',{},.8,6,null)];
+const drux=makeActor('guest',{outfit:'violet',hair:'short',hairColor:'black'},6.5,-4.2,'Drux');
+const storyHint=['Fale com Drux, perto do balcão técnico.','Troque para Nebulosa, ative LENTE e investigue o sinal azul no palco.','Volte até a saída do Orfeu para encerrar esta demonstração.','ALPHA CONCLUÍDA: a lente registrou uma anomalia. Aguarde a campanha completa.'];
+const hiddenClue=round(scn,-4.4,1.2,-10,.28,.54,.18,mats.blue);hiddenClue.visible=false;
+let player=null;
+function activateStory(){state.mode='story';state.actor=0;replaceWithGLB(storyActors[0],'hell');replaceWithGLB(storyActors[1],'neb');state.quest=0;state.lens=false;player=storyActors[0];for(const a of storyActors)a.view.visible=true;drux.view.visible=true;ui.title.textContent='ORFEU • HISTÓRIA';ui.mission.textContent=storyHint[0];ui.status.textContent='HISTÓRIA OFFLINE';ui.players.textContent='HellBoy + Nebulosa';$('btnSwitch').style.display='';$('btnLens').style.display='';$('btnChat').style.display='none';ui.chat.classList.remove('show');hiddenClue.visible=false;showNotice('Zulp enviou uma mensagem convidando o grupo para o Orfeu. Protótipo narrativo: não altera o cânone.');chatLine('','Modo história iniciado.','sys');}
+function activateSocial(){state.mode='social';state.lens=false;state.quest=0;const p={hair:$('hair').value,hairColor:$('hairColor').value,outfit:$('outfit').value};player=makeActor('guest',p,0,6,$('nickname').value);state.localPlayer=player;for(const a of storyActors)a.view.visible=false;drux.view.visible=false;ui.title.textContent='ORFEU • MUNDO SOCIAL';ui.mission.textContent='Explore, personalize seu avatar, conheça jogadores conectados e acene.';ui.status.textContent='MODO LOCAL · SEM MULTIPLAYER';ui.players.textContent='Jogadores reais: 0';$('btnSwitch').style.display='none';$('btnLens').style.display='none';$('btnChat').style.display='';hiddenClue.visible=false;showNotice('MODO LOCAL: você ainda está sozinho. Conecte um servidor para encontrar jogadores reais.');chatLine('','Você entrou no Orfeu. O chat só funciona com servidor online.','sys');}
+function setNearby(){state.nearby=null; if(state.mode!=='story')return; const x=player.x,z=player.z;for(const o of checkpoints){if(Math.hypot(o.x-x,o.z-z)<2.1){state.nearby=o.id;break;}}ui.interact.classList.toggle('hide',!state.nearby||state.dialog);if(state.nearby)ui.interact.textContent=state.nearby==='drux'?'E • Conversar com Drux':state.nearby==='anomalia'?'E • Investigar interferência':'E • Saída do Orfeu';}
+function doInteract(){if(state.dialog){closeSay();return;}if(state.mode!=='story')return;const n=state.nearby;if(n==='drux'){if(state.quest===0)say('Drux','Tem uma interferência perto do palco. Pode ser algum equipamento... Mas a câmera da Nebulosa talvez enxergue algo.',()=>{state.quest=1;ui.mission.textContent=storyHint[1];});else say('Drux','Se você registrou algo estranho, mantenha a fotografia. Ainda não sabemos o que significa.');}
+else if(n==='anomalia'){if(state.quest===1 && state.actor===1 && state.lens){say('Nebulosa','A lente mostrou uma marca que não estava no cenário. Vou registrar isso. Melhor voltarmos e descobrir o que é.',()=>{state.quest=2;ui.mission.textContent=storyHint[2];state.lens=false;hiddenClue.visible=false;});}else say('Interferência','Nebulosa precisa ativar a lente da câmera para investigar este sinal.');}
+else if(n==='exit'){if(state.quest===2){say('ANGELS NIGHT WORLD','Fim do prólogo experimental! Agora você pode explorar o Orfeu livremente ou retornar ao menu.',()=>{state.quest=3;ui.mission.textContent=storyHint[3];});}else say('Porta do Orfeu','Ainda falta verificar as pistas antes de sair.');}}
+function toggleLens(){if(state.mode!=='story')return;if(state.actor!==1){say('Equipamento','Troque para Nebulosa para usar a câmera investigativa.');return;}state.lens=!state.lens;hiddenClue.visible=state.lens;showNotice(state.lens?'LENTE ATIVA · procure a interferência azul no palco.':'LENTE DESLIGADA');}
+function switchStoryActor(){if(state.mode!=='story'||state.dialog)return;state.actor=1-state.actor;player=storyActors[state.actor];state.lens=false;hiddenClue.visible=false;ui.title.textContent='ORFEU • '+(state.actor?'NEBULOSA':'HELLBOY');}
+let lastSend=0;
+function send(msg){if(state.ws?.readyState===WebSocket.OPEN)state.ws.send(JSON.stringify(msg));}
+function setStatus(v,msg){state.online=v;ui.status.textContent=msg;ui.status.style.color=v?'#80efcf':'#ffcc9c';ui.players.textContent='Jogadores reais: '+(v?state.users.size+1:0);}
+function dropRemote(id){const r=state.remote.get(id);if(r){scn.remove(r.view);state.remote.delete(id);state.users.delete(id);}setStatus(state.online,state.online?'ONLINE · ORFEU '+$('room').value:'MODO LOCAL');}
+function addRemote(data){if(!data||!data.id||data.id===state.id)return;const id=String(data.id);if(state.remote.has(id))return;const info={hair:['short','bob','long'].includes(data.hair)?data.hair:'short',hairColor:slugColor[data.hairColor]?data.hairColor:'black',outfit:clothColor[data.outfit]?data.outfit:'black'};
+const a=makeActor('guest',info,Number(data.x)||0,Number(data.z)||0,String(data.name||'Visitante'),true);a.targetX=a.x;a.targetZ=a.z;a.yaw=Number(data.yaw)||0;state.remote.set(id,a);state.users.set(id,a);setStatus(state.online,`ONLINE · ${$('room').value}`);}
+function onServer(data){if(!data||typeof data!=='object')return;
+  if(data.t==='welcome'){state.id=data.id;state.users.clear();state.remote.forEach(a=>scn.remove(a.view));state.remote.clear();setStatus(true,`ONLINE · ${data.room}`);for(const p of data.players||[]){if(p.id!==state.id)addRemote(p);}chatLine('','Conectado a uma sala real.','sys');showNotice('ONLINE: outras pessoas conectadas à mesma sala aparecerão aqui.');}
+  else if(data.t==='joined'){addRemote(data.player);chatLine('',`${cleanLabel(data.player?.name)} entrou na sala.`,'sys');}
+  else if(data.t==='left'){dropRemote(data.id);chatLine('','Um jogador saiu da sala.','sys');}
+  else if(data.t==='state'){for(const p of data.players||[]){if(p.id===state.id)continue;if(!state.remote.has(p.id))addRemote(p);const a=state.remote.get(p.id);if(a){a.targetX=Number(p.x)||0;a.targetZ=Number(p.z)||0;a.targetYaw=Number(p.yaw)||0;}}}
+  else if(data.t==='chat'){chatLine(cleanLabel(data.name),String(data.text||'').slice(0,140));}
+  else if(data.t==='wave'){chatLine('',cleanLabel(data.name)+' acenou.','sys');}
+  else if(data.t==='error'){chatLine('','Servidor: '+String(data.message||'erro'),'sys');showNotice('Erro do servidor: '+String(data.message||'erro'));}
+}
+async function connectSocial(){const raw=$('serverUrl').value.trim();if(!raw)return;let target;try{target=new URL(raw);if(!['wss:','ws:'].includes(target.protocol))throw Error('Use WSS.');if(location.protocol==='https:'&&target.protocol!=='wss:')throw Error('HTTPS exige wss://');}catch(e){showNotice('Endereço inválido. Informe um link wss:// do servidor.');return;}
+  try{const ws=new WebSocket(target.toString());state.ws=ws;setStatus(false,'CONECTANDO...');ws.onopen=()=>{send({t:'join',room:$('room').value,name:cleanLabel($('nickname').value),hair:$('hair').value,hairColor:$('hairColor').value,outfit:$('outfit').value,code:$('accessCode').value});};ws.onmessage=ev=>{try{onServer(JSON.parse(ev.data));}catch{}};ws.onclose=()=>{state.ws=null;state.id=null;state.remote.forEach(a=>scn.remove(a.view));state.remote.clear();state.users.clear();setStatus(false,'MODO LOCAL · SERVIDOR DESCONECTADO');chatLine('','Conexão encerrada. Você ainda pode explorar localmente.','sys');showNotice('Servidor desconectado: modo local ativo.');};ws.onerror=()=>showNotice('Falha de conexão online. Confira o endereço WSS e a disponibilidade do servidor.');}catch{showNotice('Não foi possível abrir a conexão multiplayer.');}
+}
+function disconnect(){if(state.ws){state.ws.onclose=null;state.ws.close();}state.ws=null;state.id=null;for(const a of state.remote.values())scn.remove(a.view);state.remote.clear();state.users.clear();state.online=false;}
+function start(){disconnect();if(state.localPlayer){scn.remove(state.localPlayer.view);state.localPlayer=null;}for(const a of storyActors){a.x=a===storyActors[0]?-1:.8;a.z=a===storyActors[0]?5:6;a.y=0;a.vY=0;a.jumps=0;}persistPrefs();state.running=true;ui.menu.classList.add('hidden');if(state.mode==='story')activateStory();else{activateSocial();connectSocial();}}
+$('start').onclick=start;
+$('btnMenu').onclick=()=>{ui.menu.classList.remove('hidden');state.running=false;disconnect();};$('btnTouchMenu').onclick=$('btnMenu').onclick;
+$('btnInter').onclick=doInteract;$('btnTouchInter').onclick=doInteract;
+$('btnLens').onclick=toggleLens;$('btnTouchLens').onclick=toggleLens;
+$('btnSwitch').onclick=switchStoryActor;
+$('btnChat').onclick=()=>{ui.chat.classList.toggle('show');if(ui.chat.classList.contains('show'))ui.chatInput.focus();};$('btnTouchChat').onclick=$('btnChat').onclick;
+$('btnWave').onclick=()=>{if(state.online)send({t:'wave'});else showNotice('ACENAR: conecte o servidor para que outros jogadores vejam.');};
+$('chatSend').onclick=()=>{const s=ui.chatInput.value.trim();if(!s)return;if(!state.online){chatLine('','Chat disponível somente quando ONLINE.','sys');return;}send({t:'chat',text:s.slice(0,140)});ui.chatInput.value='';};
+ui.chatInput.addEventListener('keydown',e=>{if(e.key==='Enter'){$('chatSend').click();e.preventDefault();e.stopPropagation();}});
+function isTyping(){return document.activeElement?.tagName==='INPUT'||document.activeElement?.tagName==='TEXTAREA'||document.activeElement?.tagName==='SELECT';}
+window.addEventListener('keydown',e=>{if(isTyping())return;if(['Space','Tab','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(!state.running)return;if(e.repeat && ['Space','Tab','KeyE','KeyC','Enter'].includes(e.code))return;state.input.add(e.code);if(e.code==='Tab')switchStoryActor();if(e.code==='Space')jump();if(e.code==='KeyE')doInteract();if(e.code==='KeyC')toggleLens();if(e.code==='Enter')$('btnChat').click();});
+window.addEventListener('keyup',e=>state.input.delete(e.code));window.addEventListener('blur',()=>{state.input.clear();state.runningButton=false;setPad(0,0);});
+$('btnRun').addEventListener('pointerdown',e=>{e.preventDefault();state.runningButton=true;});for(const evt of ['pointerup','pointercancel','pointerleave'])$('btnRun').addEventListener(evt,()=>state.runningButton=false);
+$('btnJump').onclick=jump;
+function jump(){if(!state.running||state.dialog||!player)return;if(player.y<=.001){player.vY=5.3;player.jumps=1;}else if(player.jumps<2){player.vY=4.8;player.jumps++;}}
+const pad=$('pad');let padId=null;function setPad(x,y){const len=Math.hypot(x,y),d=Math.min(43,len),a=Math.atan2(y,x);state.padX=(Math.cos(a)*d)/43;state.padY=(Math.sin(a)*d)/43;$('knob').style.transform=`translate(${state.padX*43}px,${state.padY*43}px)`;if(!len){state.padX=0;state.padY=0;$('knob').style.transform='';}}
+pad.addEventListener('pointerdown',e=>{padId=e.pointerId;pad.setPointerCapture(e.pointerId);const r=pad.getBoundingClientRect();setPad(e.clientX-r.left-r.width/2,e.clientY-r.top-r.height/2);});pad.addEventListener('pointermove',e=>{if(e.pointerId!==padId)return;const r=pad.getBoundingClientRect();setPad(e.clientX-r.left-r.width/2,e.clientY-r.top-r.height/2);});const clearPad=e=>{if(e.pointerId===padId){padId=null;setPad(0,0);}};pad.addEventListener('pointerup',clearPad);pad.addEventListener('pointercancel',clearPad);
+renderer.domElement.addEventListener('pointerdown',e=>{if(!state.running||state.dialog||state.lookId!==null)return;state.lookId=e.pointerId;state.lookX=e.clientX;state.lookY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId);});renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==state.lookId)return;state.lookYaw-=(e.clientX-state.lookX)*.005;state.lookPitch=clamp(state.lookPitch+(e.clientY-state.lookY)*.003,-.12,.78);state.lookX=e.clientX;state.lookY=e.clientY;});const clearLook=e=>{if(e.pointerId===state.lookId)state.lookId=null;};renderer.domElement.addEventListener('pointerup',clearLook);renderer.domElement.addEventListener('pointercancel',clearLook);
+function animateActor(a,dt,moving){a.animTime+=dt*(moving?9:2);const anim=a.mesh?.userData?.anim;if(anim){const swing=moving?Math.sin(a.animTime)*.42:Math.sin(a.animTime)*.04;anim.upperL.rotation.x=swing;anim.upperR.rotation.x=-swing;anim.legL.rotation.x=-swing*.8;anim.legR.rotation.x=swing*.8;}a.view.position.set(a.x,a.y+(moving?.028*Math.abs(Math.sin(a.animTime)):0),a.z);a.view.rotation.y=a.yaw;if(a.badge)a.badge.lookAt(cam.position);}
+function moveActor(dt){if(!player||state.dialog)return;let ix=(state.input.has('KeyD')?1:0)-(state.input.has('KeyA')?1:0)+state.padX,iz=(state.input.has('KeyS')?1:0)-(state.input.has('KeyW')?1:0)+state.padY;const len=Math.hypot(ix,iz);const moving=len>.09;
+if(moving){ix/=Math.max(len,1);iz/=Math.max(len,1);const cs=Math.cos(state.lookYaw),sn=Math.sin(state.lookYaw);const sprint=state.runningButton||state.input.has('ShiftLeft')||state.input.has('ShiftRight');const speed=sprint?4.8:3.15;const dx=(ix*cs+iz*sn)*dt*speed, dz=(iz*cs-ix*sn)*dt*speed;player.x=clamp(player.x+dx,-10.95,10.95);player.z=clamp(player.z+dz,-13.85,13.85);player.yaw=Math.atan2(-dx,-dz);}
+if(player.y>0||player.vY>0){player.vY-=12*dt;player.y+=player.vY*dt;if(player.y<=0){player.y=0;player.vY=0;player.jumps=0;}}
+animateActor(player,dt,moving);
+if(state.mode==='story'){const friend=storyActors[1-state.actor];const dist=Math.hypot(friend.x-player.x,friend.z-player.z);if(dist>2.1){const k=Math.min(1,dt*2.1/dist);friend.x+=(player.x-friend.x)*k;friend.z+=(player.z-friend.z)*k;friend.yaw=Math.atan2(friend.x-player.x,friend.z-player.z);}animateActor(friend,dt,dist>2.1);setNearby();}
+for(const a of state.remote.values()){a.x+=(a.targetX-a.x)*Math.min(1,dt*9);a.z+=(a.targetZ-a.z)*Math.min(1,dt*9);a.yaw=a.targetYaw||a.yaw;animateActor(a,dt,true);}
+const now=performance.now();if(state.online && state.mode==='social' && now-state.lastStateSend>100){state.lastStateSend=now;send({t:'move',x:Number(player.x.toFixed(3)),z:Number(player.z.toFixed(3)),yaw:Number(player.yaw.toFixed(3))});}
+}
+const v3=new THREE.Vector3();function updateCamera(dt){if(!player)return;const target=v3.set(player.x,player.y+1.7,player.z);const rad=4.65*Math.cos(state.lookPitch);const des=new THREE.Vector3(player.x+Math.sin(state.lookYaw)*rad,player.y+3.1+Math.sin(state.lookPitch)*2.5,player.z+Math.cos(state.lookYaw)*rad);des.x=clamp(des.x,-11,11);des.z=clamp(des.z,-14,14);cam.position.lerp(des,Math.min(1,dt*9));cam.lookAt(target);}
+const clock=new THREE.Clock();let lastTick=performance.now();function tick(){requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.05);if(state.running){moveActor(dt);updateCamera(dt);}else{cam.position.set(1.3,4.2,11);cam.lookAt(0,1,-4);}
+renderer.render(scn,cam);state.frames++;state.acc+=dt;if(state.acc>.5){state.fps=Math.round(state.frames/state.acc);ui.fps.textContent='FPS: '+state.fps;state.frames=0;state.acc=0;}}
+window.addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+window.addEventListener('error',e=>{error('Erro no jogo: '+String(e.message||'desconhecido'));});
+setStatus(false,'MODO LOCAL');
+clock.start();tick();
+
+</script></body></html>
